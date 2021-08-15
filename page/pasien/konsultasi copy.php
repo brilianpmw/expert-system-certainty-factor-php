@@ -7,36 +7,53 @@ if( !isset($_SESSION["login"]) ) {
     exit;
 }
 
+
 require '../koneksi.php';
 
-//ambil data di url
-$id_user=$_GET["id"];
-var_dump($id_user);
-//query data berdasarkan id
-$kt = query("SELECT * FROM user WHERE id_user=$id_user")[0];
+$sql = query("SELECT*FROM gejala");
 
-//cek apakah tombol submit sudah ditekan atau belum
-if( isset($_POST["submit"]) ) {
+$notfound=false;
+$found=false;
 
-  //cek apakah data berhasil diubah atau tidak
-  if (ubah_user ($_POST) > 0 ) {
-    echo "
-      <script>
-        alert('Selamat, Data Anda telah Tersimpan :) ');
-        document.location.href = '';
-      </script>  
-    ";
-  } else {
-    echo "
-      <script>
-        alert('Data gagal ditambah!');
-        document.location.href = '';
-      </script>  
-    ";
-  }
+if(isset($_POST['submit'])){ 
+  $kode_gejala = $_POST['kode_gejala'];
+  $jumlah_dipilih = count($kode_gejala);
+  function array_equal($a, $b) {
+    return (
+         is_array($a) 
+         && is_array($b) 
+         && count($a) == count($b) 
+         && array_diff($a, $b) === array_diff($b, $a)
+    );
 }
+  $kode_result=[];
+  $notfound =true;
+  if ($jumlah_dipilih==0){
+    echo "<script>alert('Gejala harus diceklist..!!')</script>";
+  }else{ 
+    $get_penyakit = query("SELECT * FROM penyakit");
+   for ($i=0; $i < count($get_penyakit); $i++) { 
+    $get_rule = query("SELECT kode_gejala,kode_penyakit from basispengetahuan where kode_penyakit='" . $get_penyakit[$i]["kode_penyakit"] . "'");
+    $arr_gejala = [];
+    for ($j=0; $j <count($get_rule) ; $j++) { 
+      array_push($arr_gejala,$get_rule[$j]["kode_gejala"]);
+    }
+    if(array_equal($arr_gejala,$kode_gejala)){
+      $found = true;
+      $notfound=false;
+      $kode_result = $get_penyakit[$i];
+      tambah_result_konsultasi($_SESSION["id_user"],$get_penyakit[$i]["id_penyakit"]);
+    }   
+  }
+  // echo $notfound;
+  //   var_dump($kode_result);
+  // die();
 
-
+  
+  }
+  
+}
+ 
 ?>
 
 <!DOCTYPE html>
@@ -107,44 +124,32 @@ if( isset($_POST["submit"]) ) {
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="index_dokter.php">
+              <a class="nav-link" href="index_pasien.php">
                 <span class="menu-title">Beranda</span>
                 <i class="mdi mdi-home menu-icon"></i>
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="dpenyakit.php">
-                <span class="menu-title">Data Penyakit</span>
-                <i class="mdi mdi-file-check menu-icon"></i>
+              <a class="nav-link" href="bahan_makanan.php">
+                <span class="menu-title">Bahan Makanan</span>
+                <i class="mdi mdi-account-search menu-icon"></i>
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="dgejala.php">
-                <span class="menu-title">Data Gejala</span>
-                <i class="mdi mdi-file-document menu-icon"></i>
+              <a class="nav-link" href="konsultasi.php">
+                <span class="menu-title">Konsultasi</span>
+                <i class="mdi mdi-account-search menu-icon"></i>
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="dpangan.php">
-                <span class="menu-title">Data Bahan Makanan</span>
-                <i class="mdi mdi-file-document menu-icon"></i>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="daturan.php">
-                <span class="menu-title">Data Aturan</span>
-                <i class="mdi mdi-settings menu-icon"></i>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="riwayat_diagnosa.php">
+              <a class="nav-link" href="riwayat_diagnosa.php?id=<?= $_SESSION["id_user"];?>">
                 <span class="menu-title">Riwayat Diagnosa</span>
                 <i class="mdi mdi-format-list-bulleted menu-icon"></i>
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="edit_profil_dokter.php?id=<?= $_SESSION["id_user"];?>">
-                <span class="menu-title">Profil</span>
+              <a class="nav-link" href="edit_profil_pasien.php?id=<?= $_SESSION["id_user"];?>">
+                <span class="menu-title">Lihat Profil</span>
                 <i class="mdi mdi-autorenew menu-icon"></i>
               </a>
             </li>
@@ -155,7 +160,7 @@ if( isset($_POST["submit"]) ) {
           <div class="content-wrapper">
             <div class="page-header">
               <h3 class="page-title">
-                <span class="page-title-icon bg-gradient-danger text-white mr-2">
+                <span class="page-title-icon bg-gradient-info text-white mr-2">
                   <i class="mdi mdi-home"></i>
                 </span> Dashboard
               </h3>
@@ -164,72 +169,62 @@ if( isset($_POST["submit"]) ) {
               <div class="col-12 grid-margin stretch-card">
                 <div class="card">
                   <div class="card-body text-center">
-                    <h4 class="card-title">Lengkapi Profil Anda</h4>
-                    <hr><br><br>
+                    <h4 class="card-title">Pilih Gejala yang Anda Rasakan</h4>
+                    <hr>
+                    <form action="konsultasi.php" method="post">
+                    <blockquote class="blockquote">
+                      <?php foreach($sql as $row) : ?>
+                        <div class=" text-justify">
+                          <div class="form-check form-check-info">
+                            <label class="form-check-label">
+                            <input type="checkbox" class="form-check-input" name="kode_gejala[]" value="<?=$row["kode_gejala"] ?>"> <?= $row["nama_gejala"]; ?> </label>
+                          </div>
+                        </div>
+                      <?php endforeach; ?>
+                      </blockquote>
+                     
+                      <button type="submit" name="submit" class="btn btn-info">Cek Hasil</button>
 
-                    <form action="" method="post" enctype="multipart/form-data">
-                    <input type="hidden" name="id_user" value="<?= $kt["id_user"]; ?>">
-                    <input type="hidden" name="role" value="<?= $kt["role"]; ?>">
-                    
-                      <div class="row">
-                        <div class="col-sm-12">
-                          <div class="form-group">
-                            <label for="nama">Nama : </label>
-                            <input type="text" name="nama" id="nama" class="form-control" autocomplete="off" required value="<?= $kt["nama"];?>" >
+                      <?php 
+                      if($notfound){
+                      ?>
+                        <div class="card mt-5 text-light bg-danger mb-3" style="max-width: 90rem;">
+                          <div class="card-header"><h3>Penyakit tidak ditemukan!</h3></div>
+                          <div class="card-body">
+                            <p class="card-text">Oops,penyakit dengan gejala yang dipilih tidak ditemukan..</p>
                           </div>
+                        </div>
+                        <?php 
+                      }
+                      
+                      if($found){
+                    ?>
+                    <div class="card bg-info text-light mt-5  mb-3 rowfd" style="max-width: 90rem;">
+                      <div class="card-header"><h3>Penyakit Ditemukan!</h3></div>
+                        <div class="card-body">
+                            <p class="card-text"> <h4> <?= $kode_result["nama_penyakit"] ?> </h4> </p>
+                            <p class="card-text" style="text-align:justify"><?= $kode_result["keterangan"] ?></p>
+                          <h4 style="text-align:left" >Penyebab : </h4>
+                            <p class="card-text" style="text-align:justify"><?= $kode_result["penyebab"] ?></p>
+                          <h4 style="text-align:left">Solusi : </h4>
+                          <p class="card-text" style="text-align:justify"><?= $kode_result["penyebab"] ?></p>
                         </div>
                       </div>
-                      <div class="row">
-                        <div class="col-sm-6">
-                          <div class="form-group">
-                            <label for="username">Username :</label>
-                            <input type="text" name="username" id="username" class="form-control" autocomplete="off" required value="<?= $kt["username"];?>" >
-                          </div>
-                        </div>
-                        <div class="col-sm-6">
-                          <div class="form-group">
-                            <label for="email">Email :</label>
-                            <input type="text" name="email" id="email" class="form-control" autocomplete="off" required value="<?= $kt["email"];?>">
-                          </div>
-                        </div>
-                      </div>
-                      <div class="row">
-                        <div class="col-sm-6">
-                          <div class="form-group">
-                            <label for="username">Jenis Kelamin :</label>
-                            <input type="text" name="jk" id="jk" class="form-control" autocomplete="off" required value="<?= $kt["jk"];?>" >
-                          </div>
-                        </div>
-                        <div class="col-sm-6">
-                          <div class="form-group">
-                            <label for="email">Tanggal lahir :</label>
-                            <input type="date" name="usia" id="usia" class="form-control" autocomplete="off" required value="<?= $kt["tgl_lahir"];?>">
-                          </div>
-                        </div>
-                      </div>
-                      <div class="row">
-                        <div class="col-sm-6">
-                          <div class="form-group">
-                            <label for="password">Password :</label>
-                            <input type="password" name="password" id="password" class="form-control" autocomplete="off" required placeholder="Masukkan Password"> 
-                          </div>
-                        </div>
-                        <div class="col-sm-6">
-                          <div class="form-group">
-                            <label for="password2"> Masukkan Kembali Password :</label>
-                            <input type="password" name="password2" id="password2" class="form-control" autocomplete="off" required placeholder="Masukkan Kembali Password"> 
-                          </div>
-                        </div>
-                      </div>
-                      <button type="submit" name="submit" class="btn btn-info">Ubah Profil</button>
+                      <?php } ?>
+                    <div class="panel panel-info">
                     </form>
-              
+
                   </div>
                 </div>
               </div>
             </div>
           </div>
           <!-- content-wrapper ends -->
+
+                        <!-- result -->
+                        
+                        <!-- end result -->
+
           <!-- partial:partials/_footer.html -->
           <footer class="footer">
             <div class="container-fluid clearfix">
@@ -237,6 +232,17 @@ if( isset($_POST["submit"]) ) {
               <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> <a href="">By. Fadihah Fitri Nursasi</a> </span>
             </div>
           </footer>
+
+          <script language="JavaScript" type="text/javascript">
+            $(document).ready(function(){
+                $("#myBtn").click(function(){
+                    $("#myModal").modal();
+                });
+            });
+            function checkDiagnosa(){
+                return confirm('Apakah sudah benar gejalanya?');
+            }
+          </script>
           <!-- partial -->
         </div>
         <!-- main-panel ends -->

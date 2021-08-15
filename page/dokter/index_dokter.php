@@ -98,7 +98,7 @@ require '../koneksi.php';
             </li>
             <li class="nav-item">
               <a class="nav-link" href="dpangan.php">
-                <span class="menu-title">Data Bahan Pangan</span>
+                <span class="menu-title">Data Bahan Makanan</span>
                 <i class="mdi mdi-file-document menu-icon"></i>
               </a>
             </li>
@@ -116,7 +116,7 @@ require '../koneksi.php';
             </li>
             <li class="nav-item">
               <a class="nav-link" href="edit_profil_dokter.php?id=<?= $_SESSION["id_user"];?>">
-                <span class="menu-title">Lihat Profil</span>
+                <span class="menu-title">Profil</span>
                 <i class="mdi mdi-autorenew menu-icon"></i>
               </a>
             </li>
@@ -147,8 +147,8 @@ require '../koneksi.php';
           <!-- partial:partials/_footer.html -->
           <footer class="footer">
             <div class="container-fluid clearfix">
-              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © bootstrapdash.com 2020</span>
-              <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Free <a href="https://www.bootstrapdash.com/bootstrap-admin-template/" target="_blank">Bootstrap admin templates </a> from Bootstrapdash.com</span>
+              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block"> <b>Sistem Pakar Metabolik</b> </span>
+              <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> <a href="">By. Fadihah Fitri Nursasi</a> </span>
             </div>
           </footer>
           <!-- partial -->

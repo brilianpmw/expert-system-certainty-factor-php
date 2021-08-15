@@ -1,40 +1,59 @@
 <?php
 
 session_start();
-
-if( !isset($_SESSION["login"]) ) {
-    header("Location: ../../login/login_admin.php");
-    exit;
-}
-
 require '../koneksi.php';
-
-//ambil data di url
-$id_user=$_GET["id"];
-var_dump($id_user);
-//query data berdasarkan id
-$kt = query("SELECT * FROM user WHERE id_user=$id_user")[0];
-
-//cek apakah tombol submit sudah ditekan atau belum
 if( isset($_POST["submit"]) ) {
-
-  //cek apakah data berhasil diubah atau tidak
-  if (ubah_user ($_POST) > 0 ) {
+  // cek apakah data berhasil ditambahkan atau tidak
+  if (tambah_rule ($_POST) > 0 ) {
     echo "
       <script>
-        alert('Selamat, Data Anda telah Tersimpan :) ');
-        document.location.href = '';
+        alert('data berhasil di update!');
+        document.location.href = 'daturan.php';
       </script>  
     ";
   } else {
     echo "
       <script>
-        alert('Data gagal ditambah!');
-        document.location.href = '';
+        alert('data gagal ditambah!');
+        document.location.href = 'daturan.php';
       </script>  
     ";
+  
   }
 }
+if( !isset($_SESSION["login"]) ) {
+    header("Location: ../../login/login_admin.php");
+    exit;
+}
+
+if(!$_GET['id_penyakit']){
+  echo "
+  <script>
+    document.location.href = 'daturan.php';
+  </script>  
+";
+}
+$get_penyakit = query("select * from penyakit where id_penyakit='" . $_GET['id_penyakit'] . "'");
+if(count($get_penyakit) == 0){
+  echo "
+  <script>
+    document.location.href = 'daturan.php';
+  </script>  
+  ";
+}
+
+
+$get_gejala_uniq = query("select kode_gejala from basispengetahuan where kode_penyakit='" . $get_penyakit[0]['kode_penyakit'] . "'");
+$dgejala = query("SELECT*FROM gejala");
+$arr_gejala = [];
+for($i=0;$i<count($get_gejala_uniq);$i++){
+array_push($arr_gejala,$get_gejala_uniq[$i]["kode_gejala"]);
+}
+// var_dump($get_gejala_uniq);
+// var_dump($dgejala);
+// echo((in_array('G001',$arr_gejala)));
+// die();
+//cek apakah tombol submit sudah ditekan atau belum
 
 
 ?>
@@ -155,7 +174,7 @@ if( isset($_POST["submit"]) ) {
           <div class="content-wrapper">
             <div class="page-header">
               <h3 class="page-title">
-                <span class="page-title-icon bg-gradient-danger text-white mr-2">
+                <span class="page-title-icon bg-gradient-info text-white mr-2">
                   <i class="mdi mdi-home"></i>
                 </span> Dashboard
               </h3>
@@ -164,66 +183,48 @@ if( isset($_POST["submit"]) ) {
               <div class="col-12 grid-margin stretch-card">
                 <div class="card">
                   <div class="card-body text-center">
-                    <h4 class="card-title">Lengkapi Profil Anda</h4>
-                    <hr><br><br>
+                    <h4 class="card-title">Tambah Data Aturan</h4>
+                    <hr><br>
 
-                    <form action="" method="post" enctype="multipart/form-data">
-                    <input type="hidden" name="id_user" value="<?= $kt["id_user"]; ?>">
-                    <input type="hidden" name="role" value="<?= $kt["role"]; ?>">
-                    
-                      <div class="row">
-                        <div class="col-sm-12">
-                          <div class="form-group">
-                            <label for="nama">Nama : </label>
-                            <input type="text" name="nama" id="nama" class="form-control" autocomplete="off" required value="<?= $kt["nama"];?>" >
+                    <form action="tambah_aturan.php" id="form1" name="form1" method="post" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <input readonly="readonly"   type="text" name="kode_penyakit" value="<?php echo $get_penyakit[0]['kode_penyakit']; ?>" id="kode_penyakit" class="form-control" autocomplete="off" placeholder="kode penyakit"> 
+                        </div>
+                        <div class="form-group">
+                            <input readonly="readonly"  type="text" name="nama_" value="<?php echo $get_penyakit[0]['nama_penyakit']; ?>" id="nama_p" class="form-control" autocomplete="off" placeholder="nama penyakit"> 
+                        </div>
+                        <!-- <select required class="form-control" name="kode_penyakit">
+                        <option value="">------------- PILIH PENYAKIT -------------</option>
+                            <?php
+                            $sql = "SELECT * FROM penyakit";
+                            $result1 = mysqli_query($conn, $sql);
+                            
+                                while ($row = mysqli_fetch_array($result1)) {
+                                  echo "<option value='".$row['kode_penyakit']."'>".$row['kode_penyakit']." ".$row['nama_penyakit']."</option>";
+                                
+                                }
+                                
+                            ?>
+                        </select><br> -->
+                        
+                        <blockquote class="blockquote">
+                      <?php foreach($dgejala as $row) : ?>
+                        <div class=" text-justify">
+                          <div class="form-check form-check-info">
+                            <label class="form-check-label">
+                            <input <?php 
+                            if((in_array($row["kode_gejala"],$arr_gejala))){
+                              echo "checked";
+                            }   ?> type="checkbox" class="form-check-input" name="kode_gejala[]" value="<?=$row["kode_gejala"] ?>"> <?= $row["nama_gejala"]; ?> </label>
                           </div>
                         </div>
-                      </div>
-                      <div class="row">
-                        <div class="col-sm-6">
-                          <div class="form-group">
-                            <label for="username">Username :</label>
-                            <input type="text" name="username" id="username" class="form-control" autocomplete="off" required value="<?= $kt["username"];?>" >
-                          </div>
-                        </div>
-                        <div class="col-sm-6">
-                          <div class="form-group">
-                            <label for="email">Email :</label>
-                            <input type="text" name="email" id="email" class="form-control" autocomplete="off" required value="<?= $kt["email"];?>">
-                          </div>
-                        </div>
-                      </div>
-                      <div class="row">
-                        <div class="col-sm-6">
-                          <div class="form-group">
-                            <label for="username">Jenis Kelamin :</label>
-                            <input type="text" name="jk" id="jk" class="form-control" autocomplete="off" required value="<?= $kt["jk"];?>" >
-                          </div>
-                        </div>
-                        <div class="col-sm-6">
-                          <div class="form-group">
-                            <label for="email">Tanggal lahir :</label>
-                            <input type="date" name="usia" id="usia" class="form-control" autocomplete="off" required value="<?= $kt["tgl_lahir"];?>">
-                          </div>
-                        </div>
-                      </div>
-                      <div class="row">
-                        <div class="col-sm-6">
-                          <div class="form-group">
-                            <label for="password">Password :</label>
-                            <input type="password" name="password" id="password" class="form-control" autocomplete="off" required placeholder="Masukkan Password"> 
-                          </div>
-                        </div>
-                        <div class="col-sm-6">
-                          <div class="form-group">
-                            <label for="password2"> Masukkan Kembali Password :</label>
-                            <input type="password" name="password2" id="password2" class="form-control" autocomplete="off" required placeholder="Masukkan Kembali Password"> 
-                          </div>
-                        </div>
-                      </div>
-                      <button type="submit" name="submit" class="btn btn-info">Ubah Profil</button>
+                      <?php endforeach; ?>
+                      </blockquote>
+
+                        
+                        <button type="submit" name="submit" class="btn btn-info">Tambah Aturan</button>
                     </form>
-              
+
                   </div>
                 </div>
               </div>

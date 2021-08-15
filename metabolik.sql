@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 24, 2021 at 03:20 PM
+-- Generation Time: Aug 15, 2021 at 09:28 AM
 -- Server version: 10.4.14-MariaDB
 -- PHP Version: 7.4.10
 
@@ -29,27 +29,42 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `basispengetahuan` (
   `id_rule` int(5) NOT NULL,
+  `kode_rule` varchar(5) NOT NULL,
+  `kode_penyakit` varchar(5) NOT NULL,
   `kode_gejala` varchar(5) NOT NULL,
-  `kode_penyakit` varchar(10) NOT NULL,
-  `kode_rule` varchar(10) NOT NULL
+  `mb` varchar(5) NOT NULL,
+  `md` varchar(5) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `basispengetahuan`
 --
 
-INSERT INTO `basispengetahuan` (`id_rule`, `kode_gejala`, `kode_penyakit`, `kode_rule`) VALUES
-(105, 'G001', 'P002', 'R002'),
-(106, 'G002', 'P002', 'R002'),
-(107, 'G003', 'P002', 'R002'),
-(108, 'G004', 'P002', 'R002'),
-(140, 'G001', 'P001', ''),
-(141, 'G002', 'P001', ''),
-(142, 'G003', 'P001', ''),
-(148, 'G001', 'P003', ''),
-(149, 'G002', 'P003', ''),
-(150, 'G003', 'P003', ''),
-(151, 'G004', 'P003', '');
+INSERT INTO `basispengetahuan` (`id_rule`, `kode_rule`, `kode_penyakit`, `kode_gejala`, `mb`, `md`) VALUES
+(212, 'R001', 'P001', 'G001', '0,6', '0,2'),
+(213, 'R002', 'P001', 'G002', '1', '0,2'),
+(214, 'R003', 'P001', 'G003', '1', '0'),
+(215, 'R004', 'P001', 'G004', '0,8', '0,2'),
+(216, 'R005', 'P002', 'G005', '0,6', '0,2'),
+(217, 'R006', 'P002', 'G006', '0,8', '0,2'),
+(218, 'R007', 'P002', 'G007', '0,6', '0,2'),
+(219, 'R008', 'P002', 'G008', '0,8', '0'),
+(220, 'R009', 'P002', 'G009', '1', '0'),
+(221, 'R010', 'P002', 'G010', '0,8', '0,2'),
+(222, 'R011', 'P003', 'G001', '1', '0'),
+(223, 'R012', 'P003', 'G009', '0,6', '0,2'),
+(224, 'R013', 'P003', 'G010', '0,8', '0'),
+(225, 'R014', 'P003', 'G011', '1', '0'),
+(226, 'R015', 'P004', 'G001', '0,6', '0,2'),
+(227, 'R016', 'P004', 'G012', '0,8', '0'),
+(228, 'R017', 'P004', 'G013', '1', '0,2'),
+(229, 'R018', 'P004', 'G014', '1', '0'),
+(230, 'R019', 'P005', 'G015', '0,8', '0,2'),
+(231, 'R020', 'P005', 'G009', '0,6', '0,2'),
+(232, 'R021', 'P005', 'G016', '1', '0,2'),
+(233, 'R022', 'P005', 'G017', '0,8', '0'),
+(234, 'R023', 'P005', 'G018', '0,8', '0'),
+(235, 'R024', 'P005', 'G019', '0,8', '0,2');
 
 -- --------------------------------------------------------
 
@@ -147,29 +162,25 @@ CREATE TABLE `gejala` (
 --
 
 INSERT INTO `gejala` (`id_gejala`, `kode_gejala`, `nama_gejala`) VALUES
-(4, 'G001', 'Sendi terasa sakit dan nyeri'),
-(5, 'G002', 'Bengkak pada persendian'),
-(6, 'G003', 'Persendian susah digerakan'),
-(7, 'G004', 'Mengalami kesulitan berjalan'),
-(8, 'G005', 'Nyeri sendi saat bangun tidur'),
-(9, 'G006', 'Jempol kaki terasa nyeri'),
-(10, 'G007', 'Penurunan berat badan yang berlebih'),
-(11, 'G008', 'Sering buang air kecil (poliuria)'),
-(12, 'G009', 'Sering merasa haus (polidipsia)'),
-(13, 'G010', 'Sering merasa lapar (polifagia)'),
-(14, 'G011', 'Tingkat penyembuhan luka yang lambat'),
-(15, 'G012', 'Sering mengalami mual atau muntah'),
-(16, 'G013', 'Mengalami sakit kepala atau pusing'),
-(17, 'G014', 'Sering mengalami kebas atau kesemutan (mati rasa)'),
-(18, 'G015', 'Penglihatan Kabur'),
-(19, 'G016', 'Mengalami nyeri pada otot'),
-(20, 'G017', 'Badan terasa pegal (myalgia)'),
-(21, 'G018', 'Mudah lelah'),
-(22, 'G019', 'Mudah mengantuk'),
-(23, 'G020', 'Kesulitan bernapas / sesak napas'),
-(24, 'G021', 'Berat badan bertambah secara signifikan'),
-(25, 'G022', 'Nyeri pada tulang belakang'),
-(26, 'G023', 'Menderita darah tinggi');
+(38, 'G001', 'Mengalami sakit kepala atau pusing'),
+(39, 'G002', 'Bengkak pada persendian hingga menimbulkan warna kemerahan'),
+(40, 'G003', 'Persendian terasa sakit sekali saat akan digerakan'),
+(41, 'G004', 'Nyeri pada sendi saat bangun tidur dan pada saat malam hari'),
+(42, 'G005', 'Sering buang air kecil (Polyuria)'),
+(43, 'G006', 'Sering merasa haus (Polydipsia) dan lapar (Polifagia)'),
+(44, 'G007', 'Berat badan menurun, namun nafsu makan bertambah'),
+(45, 'G008', 'Tingkat penyembuhan luka yang lambat'),
+(46, 'G009', 'Mudah lelah dan mengantuk'),
+(47, 'G010', 'Penglihatan kabur'),
+(48, 'G011', 'Nyeri dada kiri, disertai jantung berdebar-debar'),
+(49, 'G012', 'Mengalami nyeri pada kaki'),
+(50, 'G013', 'Kram pada malam hari'),
+(51, 'G014', 'Perubahan pada kuku (Kuku menebal dan pertumbuhannya menjadi lamban)'),
+(52, 'G015', 'Berat badan bertambah secara signifikan'),
+(53, 'G016', 'Mengalami gangguan pernapasan'),
+(54, 'G017', 'Sendi terasa sakit dan nyeri'),
+(55, 'G018', 'Nyeri pada tulang belakang'),
+(56, 'G019', 'Menderita darah tinggi');
 
 -- --------------------------------------------------------
 
@@ -190,21 +201,13 @@ CREATE TABLE `hasilkonsultasi` (
 
 INSERT INTO `hasilkonsultasi` (`id_konsultasi`, `id_user`, `id_penyakit`, `tanggal`) VALUES
 (1, 28, 1, '2021-07-10'),
-(3, 28, 1, '2021-07-12'),
 (4, 28, 1, '2021-07-14'),
-(13, 28, 1, '2021-07-14'),
-(14, 28, 1, '2021-07-14'),
-(26, 28, 1, '2021-07-14'),
-(27, 28, 1, '2021-07-14'),
-(28, 28, 1, '2021-07-14'),
-(29, 28, 1, '2021-07-14'),
-(30, 28, 1, '2021-07-14'),
-(31, 28, 1, '2021-07-14'),
-(32, 28, 1, '2021-07-14'),
-(33, 28, 1, '2021-07-14'),
-(34, 28, 1, '2021-07-14'),
-(35, 28, 1, '2021-07-14'),
-(36, 28, 1, '2021-07-15');
+(36, 28, 1, '2021-07-15'),
+(38, 28, 6, '2021-07-30'),
+(39, 27, 1, '2021-08-01'),
+(40, 28, 1, '2021-08-14'),
+(41, 28, 1, '2021-08-14'),
+(42, 28, 1, '2021-08-14');
 
 -- --------------------------------------------------------
 
@@ -231,9 +234,7 @@ INSERT INTO `penyakit` (`id_penyakit`, `kode_penyakit`, `nama_penyakit`, `gambar
 (2, 'P002', 'Diabetes Mellitus', '60c4b515e4aab.jpg', '      Menurut World Health Organization (WHO), Diabetes Mellitus adalah suatu penyakit kronis dimana organ pancreas tidak memproduksi cukup insulin atau ketika tubuh tidak efektif dalam menggunakannya. Diabetes Mellitus adalah gangguan metabolisme yang secara genetis dan klinis termasuk heterogen dengan manifestasi berupa hilangnya toleransi karbohidrat (Price dan Wilson, 2006). Diabetes Mellitus adalah keadaan hiperglikemi kronik yang disertai berbagai kelainan metabolik akibat gangguan hormonal yang menimbulkan berbagai komplikasi kronik pada mata, ginjal, saraf dan pembuluh darah (Mansjoer dkk, 1999).\r\n\r\nHiperglikemia atau terjadinya peningkatan kadar gula darah adalah salah satu efek yang terjadi jika penyakit diabetes tidak terkontrol dan lambat laun akan mengakibatkan kerusakan diberbagai sistem di dalam tubuh khususnya saraf dan pembuluh darah. Ppenyakit metabolik yang berlangsung lama atau kronis yang ditandai dengan peningkatan kadar gula darah sebagai akibat dari kelainan insulin, aktivitas insulin ataupun sekresi insulin yang dapat menimbukan berbagai masalah serius dan prevalensi dari penyakit diabetes mellitus ini berkembang sangat cepat (Smeltzer &amp;Bare, 2008).\r\n   ', '        1.	Mempertahankan berat badan ideal dengan mengkonsumsi makanan rendah lemak\r\n2.	Mengkonsumsi makanan tinggi serat (buah dan sayur)\r\n3.	Mengurangi konsumsi makanan dan minuman manis\r\n4.	Berolah raga secara rutin dan banyak melakukan aktivitas fisik\r\n    ', '        1.	Terlalu banyak mengkonsumsi makanan manis dan gorengan\r\n2.	Kurangnya aktifitas fisik atau olahraga\r\n3.	Memiliki berat badan yang berlebih\r\n4.	Distribusi lemak perut yang tinggi\r\n5.	Kurangnya insulin\r\n6.	Tingginya kadar kortikosteroid\r\n7.	Riwayat kesehatan keluarga\r\n8.	Memiliki kondisi medis tertentu (riwayat penyakit jantung, hipertensi dan dislipidemia)\r\n9.	Diet tidak seimbang (tinggi gula, garam, lemak dan rendah serat)\r\n    '),
 (4, 'P003', 'Hipertensi', '60c4a4f56ec34.jpg', '              Hipertensi atau biasa disebut sebagai penyakit darah tinggi merupakan penyakit yang menjadi perhatian bagi semua kalangan masyarakat. Penyakit Hipertensi timbul akibat adanya interaksi dari berbagai faktor resiko yang dimiliki seseorang. Umunya hipertensi terjadi jika tekanan darah diatas 140/90 mmHg. Selain itu faktor resiko yang dapat menyebabkan hipertensi adalah faktor genetik, obesitas, kelebihan asupan natrium, dislipedemia, kurangnya aktivitas fisik dan defisiensi vitamin D (Dharmeizar, 2012).\r\n\r\n          Berdasarkan penelitian yang telah dilakukan ternyata prevalensi (amhka kejadian) hipertensi meningkat dengan bertambahnya usia. Dari berbagai penelitian epidemiologis yang dilakukan di Indonesia menunjukkan 1,8-28,6% penduduk yang berusia diatas 20 tahun adalah penderita hipertensi. \r\n\r\n          Menurut American Society of Hypertension (ASH), hipertensi adalah suatu sindrom atau kumpulan gejala kardiovaskuler yang progresif akibat dari kondisi lain yang kompleks dan saling berhubungan. Penyakit hipertensi dapat meningkatkan risiko terjadinya penyakit kardiovaskuler. Setiap peningkatan 20 mmHg tekanan darah sistolik atau 10 mmHg tekanan darah diastolic dapat meningkatkan risiko kematian akibat penyakit jantung iskemik dan strok (Chobanian, dkk, 2003).\r\n   ', '      1.	Mengkonsumsi makanan yang rendah lemak dan kaya serat (buah dan sayur)\r\n2.	Membatasi asupan garam\r\n3.	Hindari konsumsi minuman beralkohol\r\n4.	Mengurangi konsumsi kafein yang berlebihan\r\n5.	Hentikan kebiasaan merokok\r\n6.	Berolah raga secara rutin dan banyak melakukan aktivitas fisik\r\n   ', '      1.	Faktor usia (&gt;65 tahun)\r\n2.	Merokok \r\n3.	Memiliki berat badan yang berlebih\r\n4.	Memiliki tekanan darah tinggi\r\n5.	Kurangnya aktifitas fisik atau olahraga\r\n6.	Kurangnya asupan buah dan sayur\r\n7.	Terlalu banyak mengkonsumsi kafein\r\n8.	Mengkonsumsi obat-obatan tertentu (pil KB, obat flu dan dekongeston)\r\n9.	Memiliki kelainan bawaan pada pembuluh darah\r\n10.	Diet tidak seimbang (konsumsi garam, berlebih dan kurang mengkonsumsi natrium/sodium)\r\n11.	Riwayat kesehatan keluarga\r\n   '),
 (5, 'P004', 'Kolesterol', '60c75435d4482.jpg', 'Kolesterol adalah salah satu lemak tubuh yang berada dalam bentuk asam lemak bebas dan ester serta merupakan komponen utama selaput sel otak dan saraf. Kolesterol dalam tubuh manusia dapat dihasilkan sendiri oleh organ hati, korteks, adrenal, kulit, usus, lambung, otot, jaringan adipose dan otak. Kolesterol juga dapat diperoleh dari luar tubuh yaitu melalui makanan hewani. Faktoe luar inilah yang menjadi salah satu penyebab kadar kolesterol menjadi tinggi jika tidak di kontrol dengan baik. \r\n\r\nKolesterol sangat dibutuhkan manusia sebagai pembentuk bermacam-macam fungsi didalam tubuh, antara lain membentuk dinding sel baru, membantu tubuh memproduksi vitamin D, sejumlah hormon, dan asam empedu untuk mencerna lemak. Berdasarkanstruktur kimia, kolesterol merupakan kelompok steroid, yaitu suatu zat yang termasuk kedalam golongan lipid. Namun jika jumlah kolesterol melebihi kebutuhan, maka dapat mengendap pada dinding-dinding arteri yang menyebabkan penyakit.\r\n\r\nSecara umum, total kadar kolesterol di dalam tubuh manusia yang baik adalah di bawah200 mg/dl, dengan kadar kolestrol jahat (Low Density Lipoprotein) di bawah angka 130,dan kolestrol baik (High Density Lipoprotein) berada di atas angka 40. Yang menjadimasalah adalah jika jumlah kolesterol berlebihan yang bisa menimbulkan penyakit lainnya.', '1.	Rajin mengkonsumsi makanan sehat dan bergizi (buah, sayur serta biji-bijian utuh)\r\n2.	Mengkonsumsi makanan yang rendah lemak\r\n3.	Berhenti merokok\r\n4.	Melakukan olahraga secara rutin dan banyak melakukan aktivitas fisik\r\n', '   1.	Merokok\r\n2.	Gaya hidup yang tidak sehat\r\n3.	Memiliki berat badan yang berlebih (obesitas)\r\n4.	Kurangnya aktifitas fisik atau olahraga\r\n5.	Riwayat kesehatan keluarga\r\n'),
-(6, 'P005', 'Obesitas', '60c754858d601.jpg', '  Obesitas adalah kelebihan berat badan sebagai akibat dari penimbunan lemak tubuh yang berlebihan. Obesitas dapat dikatakan sebagai kondisi kronis yang terjadi akibat penumpukan lemak dalam tubuh sehingga berat badan berada diluar vatas ideal. Setiap orang memerlukan sejumlah lemak tubuh untuk menyimpan energy, sebagai penyekat panas, penyerap guncangan dan fungsi lainnya.\r\n\r\nRata-rata wanita memiliki lemak tubuhyang lebih banyak dibandingkan pria. Perbandingan yang normal antara lemak tubuh dengan berat badan adalah sekitar 25-30% pada wanita dan 18-23% pada pria. Wanita dengan lemak tubuh lebih dari 30% dan pria dengan lemak tubuh lebih dari 25% dianggap mengalami obesitas. Seseorang yang memiliki berat badan 20% lebih tinggi dari nilai tengah kisaran berat badannya yang normal dianggap mengalami obesitas.\r\n\r\nObesitas digolongkan menjadi 3 kelompok :\r\n--	Obesitas ringan : kelebihan berat badan 20-40%\r\n--	Obesitas sedang : kelebihan berat badan 41-100%\r\n--	Obesitas berat : kelebihan berat badan &gt;100% (Obesitas berat ditemukan sebanyak 5% dari antara orang-orang yang gemuk)\r\n\r\nBanyak faktor yang dapat mempengaruhi obesitas diantaranya yaitu tingkat pendidikan dan pekerjaan, stress, aktivitas fisik, jenis kelamin, usia, perubahan gaya hidup, asupan nutrisi yang semakin banyak dari makanan olahan atau diet dengan tinggi kalori ', '  1.	Mengkonsumsi makanan sehat (makanan rendah kalori dan padat nutrisi)\r\n2.	Berolah raga secara rutin dan banyak melakukan aktivitas fisik\r\n3.	Melakukan diet sehat\r\n4.	Membatasi konsumsi gula, garam dan lemak berlebih\r\n ', '     1.	Faktor usia\r\n2.	Gaya hidup yang tidak sehat\r\n3.	Kurangnya waktu istirahat\r\n4.	Pola makan yang berlebih dan tidak shat\r\n5.	Mengkonsumsi obat-obatan tertentu (antidepresan, antipsikotik dan antikonvulsan)\r\n6.	Memiliki kondisi medis tertentu (sindrom cushing dan hormon tiroid yang kurang dalam tubuh)\r\n7.	Kurangnya aktifitas fisik atau olahraga\r\n8.	Riwayat kesehatan keluarga\r\n '),
-(9, 'P007', 'COBA', '60e476c1ed65e.jpg', 'COBACOBACOBACOBACOBACOBACOBACOBA', 'COBACOBACOBACOBACOBACOBA', 'COBACOBA'),
-(10, 'P008', 'PUSHENG', '60f843e12bde9.jpg', 'KLKLKLKLKL', 'LLLL', 'KKK');
+(6, 'P005', 'Obesitas', '60c754858d601.jpg', '  Obesitas adalah kelebihan berat badan sebagai akibat dari penimbunan lemak tubuh yang berlebihan. Obesitas dapat dikatakan sebagai kondisi kronis yang terjadi akibat penumpukan lemak dalam tubuh sehingga berat badan berada diluar vatas ideal. Setiap orang memerlukan sejumlah lemak tubuh untuk menyimpan energy, sebagai penyekat panas, penyerap guncangan dan fungsi lainnya.\r\n\r\nRata-rata wanita memiliki lemak tubuhyang lebih banyak dibandingkan pria. Perbandingan yang normal antara lemak tubuh dengan berat badan adalah sekitar 25-30% pada wanita dan 18-23% pada pria. Wanita dengan lemak tubuh lebih dari 30% dan pria dengan lemak tubuh lebih dari 25% dianggap mengalami obesitas. Seseorang yang memiliki berat badan 20% lebih tinggi dari nilai tengah kisaran berat badannya yang normal dianggap mengalami obesitas.\r\n\r\nObesitas digolongkan menjadi 3 kelompok :\r\n--	Obesitas ringan : kelebihan berat badan 20-40%\r\n--	Obesitas sedang : kelebihan berat badan 41-100%\r\n--	Obesitas berat : kelebihan berat badan &gt;100% (Obesitas berat ditemukan sebanyak 5% dari antara orang-orang yang gemuk)\r\n\r\nBanyak faktor yang dapat mempengaruhi obesitas diantaranya yaitu tingkat pendidikan dan pekerjaan, stress, aktivitas fisik, jenis kelamin, usia, perubahan gaya hidup, asupan nutrisi yang semakin banyak dari makanan olahan atau diet dengan tinggi kalori ', '  1.	Mengkonsumsi makanan sehat (makanan rendah kalori dan padat nutrisi)\r\n2.	Berolah raga secara rutin dan banyak melakukan aktivitas fisik\r\n3.	Melakukan diet sehat\r\n4.	Membatasi konsumsi gula, garam dan lemak berlebih\r\n ', '     1.	Faktor usia\r\n2.	Gaya hidup yang tidak sehat\r\n3.	Kurangnya waktu istirahat\r\n4.	Pola makan yang berlebih dan tidak shat\r\n5.	Mengkonsumsi obat-obatan tertentu (antidepresan, antipsikotik dan antikonvulsan)\r\n6.	Memiliki kondisi medis tertentu (sindrom cushing dan hormon tiroid yang kurang dalam tubuh)\r\n7.	Kurangnya aktifitas fisik atau olahraga\r\n8.	Riwayat kesehatan keluarga\r\n ');
 
 -- --------------------------------------------------------
 
@@ -281,16 +282,10 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id_user`, `nama`, `username`, `email`, `jk`, `password`, `role`, `tgl_lahir`) VALUES
-(25, 'Fadihah Fitri', 'fadihah', 'fadihah@gmail.com', 'Perempuan', '$2y$10$MXJPlG4pg7YdINJaJxRaKeeRsmq9aNjaylX8b1mmbMMaIeJ0xK7uy', 'Admin', '2021-06-27'),
-(27, 'Brilian Fitri', 'ian', 'ian@gmail.com', 'Laki-laki', '$2y$10$JFNs8ZDkByg8IddpOJczf.YIApgZmXXvEAo4ELTldoeLkB8Ufzyj.', 'Dokter', NULL),
+(25, 'Fadihah Fitri', 'fadihah', 'fadihah@gmail.com', 'Perempuan', '$2y$10$XAUsG1FIwZfxzxQxC6ptnegbK5VAqtDypT1eb6wiKPFu6gJOK3hoO', 'Admin', '1990-01-23'),
+(27, 'Brilian Fitri', 'ian', 'ian@gmail.com', 'Laki-laki', '$2y$10$L9.Cg9XIpPkM5s8swNGnN.OMil11BEZU5Ha3uZqe/vwI9VF5rfFx2', 'Dokter', '1991-01-23'),
 (28, 'Fitri Nursasi', 'fitri', 'fitri@gmail.com', 'Perempuan', '$2y$10$djyF3ptP5b8L4QUqc5NuK.2knWmZTGl9Bbxb.M4eNVHMRyM6GbTNG', 'Pasien', '2020-03-16'),
-(29, 'Puja Nursasi', 'iannti', 'iannti@gmail.com', 'Laki-laki', '$2y$10$xsYCRuN4OAPb740zZck8IuJ.7bOw.hI.Bg/WLdbfftAIWZ3DBrtt.', 'Dokter', NULL),
-(33, 'kkk nn', 'kn', 'kn', 'p', '$2y$10$TwCQvDKOO4L7SLNVrhkncOrERb4KAmL3BU3d.s8MrhB0fUHVsuD2i', 'Pasien', NULL),
-(35, 'test', 'test', 'wad@mail.com', 'ada', '$2y$10$aJPalsP6/e55stB0fSzfiutdFy/004im9ZDF7cmd3QVKcfa.Ei9J6', 'Pasien', '2021-07-29'),
-(36, 'brilian', 'wicak', 'iwa@con.com', 'laki', '$2y$10$2M./bgSbMa9WPB74TdT3m.lS7KXsmdrwuM3VXCtJgTFTER5QY769q', 'Dokter', '2021-02-11'),
-(37, 'pasien', 'pasien', 'pasien@pasien.com', 'pria', '$2y$10$.crWrvKGTwHDkQgPytJfveczCkyCC5TwpYYrNOSCGUW4UErcN9BWm', 'Pasien', '2021-07-12'),
-(38, 'diha', 'diha', 'diha@gmail.com', 'perempuan', '$2y$10$rSIP532xRTsDrsiU7w50ouWIOWq4Q6XE.yxoKlABPoh/8Ni3Hf/6y', 'Pasien', '2020-11-18'),
-(39, 'nti', 'nti', 'nti@gmail.com', 'perempuan', '$2y$10$Wk98ceToz3icPSZ/XK57XeZOodVs9jbguyu0mV0OqIGkdL0ZdBRk6', 'Dokter', '2000-07-26');
+(47, 'nti', 'nti', 'nti@gmail.com', 'pr', '$2y$10$BFlD1iT7oWokDyxp/xk3ve8T4sRXHBL3QKPw7cz7iCgslx5vG5MOu', 'Pasien', '2021-08-11');
 
 --
 -- Indexes for dumped tables
@@ -346,7 +341,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `basispengetahuan`
 --
 ALTER TABLE `basispengetahuan`
-  MODIFY `id_rule` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=152;
+  MODIFY `id_rule` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=236;
 
 --
 -- AUTO_INCREMENT for table `bpangan`
@@ -358,13 +353,13 @@ ALTER TABLE `bpangan`
 -- AUTO_INCREMENT for table `gejala`
 --
 ALTER TABLE `gejala`
-  MODIFY `id_gejala` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `id_gejala` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 
 --
 -- AUTO_INCREMENT for table `hasilkonsultasi`
 --
 ALTER TABLE `hasilkonsultasi`
-  MODIFY `id_konsultasi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id_konsultasi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT for table `penyakit`
@@ -382,7 +377,7 @@ ALTER TABLE `pesan`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id_user` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `id_user` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

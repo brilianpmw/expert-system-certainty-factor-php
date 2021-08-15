@@ -374,7 +374,7 @@ if(isset($_POST["submit"])) {
     <div class="container d-md-flex py-4">
       <div class="mr-md-auto text-center text-md-left">
         <div class="copyright">
-          &copy; Copyright <strong> | <span>Sistem Pakar Metabolik</span></strong>
+           <strong><span>Sistem Pakar Metabolik</span></strong>
         </div>
         <div class="credits">
            <p> By. Fadihah Fitri N </p>

@@ -5219,7 +5219,7 @@ input[type="button"].btn-block {
   .nav-link:hover, .nav-link:focus {
     text-decoration: none; }
   .nav-link.disabled {
-    color: #6c757d;
+    color: #7d6c6c;
     pointer-events: none;
     cursor: default; }
 
@@ -5239,7 +5239,7 @@ input[type="button"].btn-block {
       border-color: transparent; }
   .nav-tabs .nav-link.active,
   .nav-tabs .nav-item.show .nav-link {
-    color: #343a40;
+    color: #403434;
     background-color: #ffffff;
     border-color: #ebedf2 #ebedf2 #ffffff; }
   .nav-tabs .dropdown-menu {
@@ -10482,7 +10482,7 @@ code {
 
 /* Footer */
 .footer {
-  background: #90a7c4;
+  background: #3b6787;
   border-top: 1px solid #fdfdfd;
   padding: 30px 1rem;
   transition: all 0.25s ease;
@@ -13278,7 +13278,7 @@ dl {
       .sidebar .nav .nav-item.active {
         background: #ffffff; }
         .sidebar .nav .nav-item.active > .nav-link .menu-title {
-          color: #b66dff;
+          color: #6d94ff;
           font-family: "ubuntu-medium", sans-serif; }
         .sidebar .nav .nav-item.active > .nav-link i {
           color: #b66dff; }
@@ -13527,7 +13527,7 @@ dl {
       width: 100%; } }
 
 .content-wrapper {
-  background: #c6d0de;
+  background: #90a7c4;
   padding: 2.75rem 2.25rem;
   width: 100%;
   -webkit-box-flex: 1;

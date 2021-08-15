@@ -130,13 +130,19 @@ if(isset($_POST['submit'])){
               </a>
             </li>
             <li class="nav-item">
+              <a class="nav-link" href="bahan_makanan.php">
+                <span class="menu-title">Bahan Makanan</span>
+                <i class="mdi mdi-account-search menu-icon"></i>
+              </a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link" href="konsultasi.php">
                 <span class="menu-title">Konsultasi</span>
                 <i class="mdi mdi-account-search menu-icon"></i>
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="riwayat_diagnosa.php">
+              <a class="nav-link" href="riwayat_diagnosa.php?id=<?= $_SESSION["id_user"];?>">
                 <span class="menu-title">Riwayat Diagnosa</span>
                 <i class="mdi mdi-format-list-bulleted menu-icon"></i>
               </a>
@@ -179,32 +185,168 @@ if(isset($_POST['submit'])){
                      
                       <button type="submit" name="submit" class="btn btn-info">Cek Hasil</button>
 
-                      <?php 
-                      if($notfound){
-                      ?>
-                        <div class="card mt-5 text-light bg-danger mb-3" style="max-width: 90rem;">
-                          <div class="card-header"><h3>Penyakit tidak ditemukan!</h3></div>
-                          <div class="card-body">
-                            <p class="card-text">Oops,penyakit dengan gejala yang dipilih tidak ditemukan..</p>
-                          </div>
-                        </div>
-                        <?php 
-                      }
+<?php
+
+$perintah = "SELECT  basispengetahuan.kode_penyakit, basispengetahuan.nama_gejala, basispengetahuan.mb, basispengetahuan.md
+FROM penyakit, gejala, basispengetahuan
+  WHERE penyakit.kode_penyakit=basispengetahuan.kode_penyakit
+    AND gejala.kode_gejala=basispengetahuan.kode_gejala 
+     ";
+  $minta =mysqli_query($conn,$perintah);
+	$sql = '';
+	$i = 0;
+  //mengecek semua chekbox gejala
+  while($hs=mysqli_fetch_array($minta))
+  {
+    //jika gejala dipilih
+    //menyusun daftar gejala misal '1','2','3' dst utk dipakai di query
+    if ($_POST['gejala'.$hs['kode_gejala']] == 'true')
+    {
+      if ($sql == '')
+      {
+        $sql = "'$hs[kode_gejala]'";
+      }
+      else
+      {
+        $sql = $sql.",'$hs[kode_gejala]'";
+      }
+    }
+    $i++;
+  }
+
+empty($daftar_penyakit);
+empty($daftar_cf);
+if($sql != '')
+{
+  //mencari kode penyakit di tabel basisdata yang gejalanya dipilih
+  $perintah = "SELECT kode_penyakit FROM basispengetahuan WHERE kode_gejala IN ($row) GROUP BY kode_penyakit ORDER BY kode_penyakit";
+  //echo "<br/>".$perintah."<br/>";
+  $minta =mysqli_query($mysqli,$perintah);
+  $kode_penyakit_terbesar = '';
+  $nama_penyakit_terbesar = '';
+  $c = 0;
+
+  while($hs=mysqli_fetch_array($minta))
+  {
+    //memproses id penyakit satu persatu
+    $kode_penyakit = $hs['kode_penyakit'];
+    $qryi = "SELECT * FROM penyakit WHERE kode_penyakit = '$kode_penyakit'";
+    $qry =mysqli_query($mysqli,$qryi);
+    $dt = mysqli_fetch_array($qry);
+    $nama_penyakit = $dt['nama_penyakit'];
+    $daftar_penyakit[$c] = $hs['kode_penyakit'];
+    $p = "SELECT kode_penyakit, mb, md, kode_gejala FROM basispengetahuan WHERE kode_gejala IN ($sql) AND kode_penyakit = '$kode_penyakit'";
+    //echo $p.'<br/>';
+    $m =mysqli_query($mysqli,$p);
+    //mencari jumlah gejala yang ditemukan
+    $jml = mysqli_num_rows($m);
+    //jika gejalanya 1 langsung ketemu CF nya
+    if ($jml == 1)
+    {
+      $h=mysqli_fetch_array($m);
+      $mb = $h['mb'];
+      $md = $h['md'];
+      $cf = $mb - $md;
+      $daftar_cf[$c] = $cf;
+      //cek apakah penyakit ini adalah penyakit dgn CF terbesar ?
+      if (($id_penyakit_terbesar == '') || ($cf_terbesar < $cf))
+      {
+        $cf_terbesar = $cf;
+        $id_penyakit_terbesar = $kode_penyakit;
+        $nama_penyakit_terbesar = $nama_penyakit;
+      }
+    //jika jumlah gejala cuma dua maka CF ketemu	
+    }
+    else if ($jml > 1)
+    {
+      $i = 1;
+      //proses gejala satu persatu
+      while($h=mysqli_fetch_array($m))
+      {
+        //pada gejala yang pertama masukkan MB dan MD menjadi MBlama dan MDlama
+        if ($i == 1)
+        {
+          $mblama = $h['mb'];
+          $mdlama = $h['md'];
+          }
+        //pada gejala yang nomor dua masukkan MB dan MD menjadi MBbaru dan MB baru kemudian hitung MBsementara dan MDsementara
+        else if ($i == 2)
+        {
+          $mbbaru = $h['mb'];
+          $mdbaru = $h['md'];
+          $mbsementara = $mblama + ($mbbaru * (1 - $mblama));
+          $mdsementara = $mdlama + ($mdbaru * (1 - $mdlama));
+          //jika jumlah gejala cuma dua maka CF ketemu
+          if ($jml == 2)
+          {
+            $mb = $mbsementara;
+            $md = $mdsementara;
+            $cf = $mb - $md;
+            $daftar_cf[$c] = $cf;
+            //cek apakah penyakit ini adalah penyakit dgn CF terbesar ?
+            if (($id_penyakit_terbesar == '') || ($cf_terbesar < $cf))
+            {
+              $cf_terbesar = $cf;
+              $id_penyakit_terbesar = $id_penyakit;
+              $nama_penyakit_terbesar = $nama_penyakit;
+            }
+          }
+        }
+        //pada gejala yang ke 3 dst proses MBsementara dan MDsementara menjadi MBlama dan MDlama
+			  //MB dan MD menjadi MBbaru dan MDbaru
+				//hitung MBsementara dan MD sementara yg sekarang
+				else if ($i >= 3)
+				{
+					$mblama = $mbsementara;
+					$mdlama = $mdsementara;
+					$mbbaru = $h['mb'];
+					$mdbaru = $h['md'];
+					$mbsementara = $mblama + ($mbbaru * (1 - $mblama));
+					$mdsementara = $mdlama + ($mdbaru * (1 - $mdlama));
+					//jika ini adalah gejala terakhir berarti CF ketemu
+					if ($jml == $i)
+					{
+						$mb = $mbsementara;
+						$md = $mdsementara;
+						$cf = $mb - $md;
+						$daftar_cf[$c] = $cf;
+            //cek apakah penyakit ini adalah penyakit dgn CF terbesar ?
+            if (($id_penyakit_terbesar == '') || ($cf_terbesar < $cf))
+            {
+              $cf_terbesar = $cf;
+              $id_penyakit_terbesar = $kode_penyakit;
+              $nama_penyakit_terbesar = $nama_penyakit;
+            }
+          }
+        }
+        $i++;
+      }
+      }
+      $c++;
+  }
+}
+//urutkan daftar gejala berdasarkan besar CF
+for ($i = 0; $i < count($daftar_penyakit); $i++)
+{
+  for ($j = $i + 1; $j < count($daftar_penyakit); $j++)
+  {
+    if ($daftar_cf[$j] > $daftar_cf[$i])
+    {
+      $t = $daftar_cf[$i];
+      $daftar_cf[$i] = $daftar_cf[$j];
+      $daftar_cf[$j] = $t;
+
+      $t = $daftar_penyakit[$i];
+      $daftar_penyakit[$i] = $daftar_penyakit[$j];
+      $daftar_penyakit[$j] = $t;
+    }
+  }
+}
+
+?>
+
+
                       
-                      if($found){
-                    ?>
-                    <div class="card bg-info text-light mt-5  mb-3 rowfd" style="max-width: 90rem;">
-                      <div class="card-header"><h3>Penyakit Ditemukan!</h3></div>
-                        <div class="card-body">
-                            <p class="card-text"> <h4> <?= $kode_result["nama_penyakit"] ?> </h4> </p>
-                            <p class="card-text" style="text-align:justify"><?= $kode_result["keterangan"] ?></p>
-                          <h4 style="text-align:left" >Penyebab : </h4>
-                            <p class="card-text" style="text-align:justify"><?= $kode_result["penyebab"] ?></p>
-                          <h4 style="text-align:left">Solusi : </h4>
-                          <p class="card-text" style="text-align:justify"><?= $kode_result["penyebab"] ?></p>
-                        </div>
-                      </div>
-                      <?php } ?>
                     <div class="panel panel-info">
                     </form>
 
@@ -222,21 +364,11 @@ if(isset($_POST['submit'])){
           <!-- partial:partials/_footer.html -->
           <footer class="footer">
             <div class="container-fluid clearfix">
-              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © bootstrapdash.com 2020</span>
-              <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Free <a href="https://www.bootstrapdash.com/bootstrap-admin-template/" target="_blank">Bootstrap admin templates </a> from Bootstrapdash.com</span>
+              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block"> <b>Sistem Pakar Metabolik</b> </span>
+              <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> <a href="">By. Fadihah Fitri Nursasi</a> </span>
             </div>
           </footer>
 
-          <script language="JavaScript" type="text/javascript">
-            $(document).ready(function(){
-                $("#myBtn").click(function(){
-                    $("#myModal").modal();
-                });
-            });
-            function checkDiagnosa(){
-                return confirm('Apakah sudah benar gejalanya?');
-            }
-          </script>
           <!-- partial -->
         </div>
         <!-- main-panel ends -->

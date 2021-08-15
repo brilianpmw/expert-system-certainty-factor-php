@@ -113,13 +113,19 @@ if( isset($_POST["submit"]) ) {
               </a>
             </li>
             <li class="nav-item">
+              <a class="nav-link" href="bahan_makanan.php">
+                <span class="menu-title">Bahan Makanan</span>
+                <i class="mdi mdi-account-search menu-icon"></i>
+              </a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link" href="konsultasi.php">
                 <span class="menu-title">Konsultasi</span>
                 <i class="mdi mdi-account-search menu-icon"></i>
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="riwayat_diagnosa.php">
+              <a class="nav-link" href="riwayat_diagnosa.php?id=<?= $_SESSION["id_user"];?>">
                 <span class="menu-title">Riwayat Diagnosa</span>
                 <i class="mdi mdi-format-list-bulleted menu-icon"></i>
               </a>
@@ -216,8 +222,8 @@ if( isset($_POST["submit"]) ) {
           <!-- partial:partials/_footer.html -->
           <footer class="footer">
             <div class="container-fluid clearfix">
-              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © bootstrapdash.com 2020</span>
-              <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Free <a href="https://www.bootstrapdash.com/bootstrap-admin-template/" target="_blank">Bootstrap admin templates </a> from Bootstrapdash.com</span>
+              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block"> <b>Sistem Pakar Metabolik</b> </span>
+              <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> <a href="">By. Fadihah Fitri Nursasi</a> </span>
             </div>
           </footer>
           <!-- partial -->

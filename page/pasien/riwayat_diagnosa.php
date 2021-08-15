@@ -21,10 +21,6 @@ $dhk = query("SELECT user.nama, penyakit.nama_penyakit, hasilkonsultasi.tanggal,
                   AND penyakit.id_penyakit=hasilkonsultasi.id_penyakit 
                   AND user.id_user = '".$_SESSION["id_user"]."'");
 
-//tombol cari diklik
-if ( isset($_POST["cari_gejala"]) ) {
-  $dhk=cari_gejala($_POST["keyword"]);
-}
 ?>
 
 <!DOCTYPE html>
@@ -102,6 +98,12 @@ if ( isset($_POST["cari_gejala"]) ) {
               </a>
             </li>
             <li class="nav-item">
+              <a class="nav-link" href="bahan_makanan.php">
+                <span class="menu-title">Bahan Makanan</span>
+                <i class="mdi mdi-account-search menu-icon"></i>
+              </a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link" href="konsultasi.php">
                 <span class="menu-title">Konsultasi</span>
                 <i class="mdi mdi-account-search menu-icon"></i>
@@ -135,20 +137,16 @@ if ( isset($_POST["cari_gejala"]) ) {
               <div class="col-12 grid-margin stretch-card">
                 <div class="card">
                   <div class="card-body text-center">
-                    <h4 class="card-title">Data Gejala</h4>
+                    <h4 class="card-title">Riwayat Diagnosa</h4>
                     <hr>
                     
                     <nav class="navbar navbar-light ">
                     <a class=" " href=""></a>
 
-                      <form class="form-inline" action="" method="post">
-                        <input class="form-control mr-sm-2" type="text" placeholder="Cari Nama gejala.." name="keyword"  autocomplete="off" autofocus>
-                        <button class="btn btn-outline-info my-2 my-sm-0" type="submit" name="cari_gejala">Cari</button>
-                      </form>
                     </nav><br>
 
                         <table class="table table-bordered">
-                            <tr class="table-info text-center">
+                            <tr class="text-center text-light" style="background-color:#2D6187;">
                             <th>No.</th>
                             <th>Nama Pasien</th>
                             <th>Nama penyakit</th>
@@ -213,8 +211,8 @@ if ( isset($_POST["cari_gejala"]) ) {
           <!-- partial:partials/_footer.html -->
           <footer class="footer">
             <div class="container-fluid clearfix">
-              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © bootstrapdash.com 2020</span>
-              <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Free <a href="https://www.bootstrapdash.com/bootstrap-admin-template/" target="_blank">Bootstrap admin templates </a> from Bootstrapdash.com</span>
+              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block"> <b>Sistem Pakar Metabolik</b> </span>
+              <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> <a href="">By. Fadihah Fitri Nursasi</a> </span>
             </div>
           </footer>
           <!-- partial -->

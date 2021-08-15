@@ -1,6 +1,7 @@
 <?php
 
 session_start();
+$con = mysqli_connect("sql209.epizy.com", "epiz_29132838", "vFeo4yUAVpGWIT", "epiz_29132838_metabolik");
 
 if( !isset($_SESSION["login"]) ) {
     header("Location: ../../login/login_admin.php");
@@ -9,34 +10,46 @@ if( !isset($_SESSION["login"]) ) {
 
 require '../koneksi.php';
 
-//ambil data di url
-$id_user=$_GET["id"];
-var_dump($id_user);
-//query data berdasarkan id
-$kt = query("SELECT * FROM user WHERE id_user=$id_user")[0];
+$jumlahdataperhalaman = 10;
+$jumlahdata = count(query("SELECT*FROM penyakit"));
+$jumlahhalaman = ceil($jumlahdata/$jumlahdataperhalaman);
+$halamanaktif = (isset($_GET["halaman"])) ? $_GET["halaman"]:1;
+$awaldata = ($jumlahdataperhalaman * $halamanaktif) - $jumlahdataperhalaman;
+$list_data = '';
+$q = "select * from penyakit order by kode_penyakit LIMIT $awaldata, $jumlahdataperhalaman";
+$q = mysqli_query($con, $q);
+$no = 0;
 
-//cek apakah tombol submit sudah ditekan atau belum
-if( isset($_POST["submit"]) ) {
+if (mysqli_num_rows($q) > 0) {
+    while ($r = mysqli_fetch_array($q)) {
+      $no++;
 
-  //cek apakah data berhasil diubah atau tidak
-  if (ubah_user ($_POST) > 0 ) {
-    echo "
-      <script>
-        alert('Selamat, Data Anda telah Tersimpan :) ');
-        document.location.href = '';
-      </script>  
-    ";
-  } else {
-    echo "
-      <script>
-        alert('Data gagal ditambah!');
-        document.location.href = '';
-      </script>  
-    ";
-  }
+
+        $id = $r['kode_penyakit'];
+        $gejala = array();
+        $qgejala = "select * from basispengetahuan where kode_penyakit='$id'"; //ambil data gejala dari tabel rule
+        $qgejala = mysqli_query($con, $qgejala);
+        while ($rgejala = mysqli_fetch_array($qgejala)) { //perulangan untuk menampung data gejala
+            $r_gejala = mysqli_fetch_array(mysqli_query($con, "select kode_gejala from gejala where kode_gejala='" . $rgejala['kode_gejala'] . "'"));
+            $gejala[] = $r_gejala['kode_gejala'];
+        }
+        $daftar_gejala = implode(" - ", $gejala); //satukan data gejala dan tambahkan pemisah "-"
+        $list_data .= '
+		<tr>
+		<td>'.$no.'</td>
+		<td>' . $r['nama_penyakit'] . '</td>
+		<td>' . $daftar_gejala . '</td>
+		<td>
+		<a href="tambah_aturan.php?id_penyakit='. $r['id_penyakit'] .'" class="btn btn-success btn-xs" title="Ubah"><i class="fa fa-edit"></i>Tambah</a> &nbsp;
+		</tr>';
+
+    }
 }
 
-
+//tombol cari diklik
+if ( isset($_POST["cari_rule"]) ) {
+  $drule=cari_rule($_POST["keyword"]);
+}
 ?>
 
 <!DOCTYPE html>
@@ -51,6 +64,7 @@ if( isset($_POST["submit"]) ) {
     <link rel="stylesheet" href="../vendor/assets/vendors/css/vendor.bundle.base.css">
     <!-- Layout styles -->
     <link rel="stylesheet" href="../vendor/assets/css/style.css">
+    
     <!-- End layout styles -->
   </head>
   <body>
@@ -126,7 +140,7 @@ if( isset($_POST["submit"]) ) {
             </li>
             <li class="nav-item">
               <a class="nav-link" href="dpangan.php">
-                <span class="menu-title">Data Bahan Makanan</span>
+                <span class="menu-title">Data Bahan Pangan</span>
                 <i class="mdi mdi-file-document menu-icon"></i>
               </a>
             </li>
@@ -144,7 +158,7 @@ if( isset($_POST["submit"]) ) {
             </li>
             <li class="nav-item">
               <a class="nav-link" href="edit_profil_dokter.php?id=<?= $_SESSION["id_user"];?>">
-                <span class="menu-title">Profil</span>
+                <span class="menu-title">Lihat Profil</span>
                 <i class="mdi mdi-autorenew menu-icon"></i>
               </a>
             </li>
@@ -155,7 +169,7 @@ if( isset($_POST["submit"]) ) {
           <div class="content-wrapper">
             <div class="page-header">
               <h3 class="page-title">
-                <span class="page-title-icon bg-gradient-danger text-white mr-2">
+                <span class="page-title-icon bg-gradient-info text-white mr-2">
                   <i class="mdi mdi-home"></i>
                 </span> Dashboard
               </h3>
@@ -164,66 +178,63 @@ if( isset($_POST["submit"]) ) {
               <div class="col-12 grid-margin stretch-card">
                 <div class="card">
                   <div class="card-body text-center">
-                    <h4 class="card-title">Lengkapi Profil Anda</h4>
-                    <hr><br><br>
-
-                    <form action="" method="post" enctype="multipart/form-data">
-                    <input type="hidden" name="id_user" value="<?= $kt["id_user"]; ?>">
-                    <input type="hidden" name="role" value="<?= $kt["role"]; ?>">
+                    <h4 class="card-title">Data Aturan</h4>
+                    <hr>
                     
-                      <div class="row">
-                        <div class="col-sm-12">
-                          <div class="form-group">
-                            <label for="nama">Nama : </label>
-                            <input type="text" name="nama" id="nama" class="form-control" autocomplete="off" required value="<?= $kt["nama"];?>" >
+                    <nav class="navbar navbar-light ">
+                    <a class=""></a>
+                      <form class="form-inline" action="" method="post">
+                        <input class="form-control mr-sm-2" type="text" placeholder="Nama Penyakit.." name="keyword"  autocomplete="off" autofocus>
+                        <button class="btn btn-outline-info my-2 my-sm-0" type="submit" name="cari_rule">Cari</button>
+                      </form>
+                    </nav><br>
+
+                        <table class="table table-bordered">
+                            <tr class="text-center text-light" style="background-color:#2D6187;">
+                            <th>No.</th>
+                            <th>Nama Penyakit</th>
+                            <th>kode Gejala</th>
+                            <th>Aksi</th>
+                            </tr>
+
+                            <tbody>
+                    <?php echo $list_data; ?>
+                </tbody>
+                        </table> <br><br>
+
+                        <!--navigasi-->
+                        <div class="container">
+                          <div class="row">
+                            <div class="col-md-6 offset-md-5">
+                              <nav aria-label="Page navigation example">
+                                <ul class="pagination">                                  
+                                  <li class="page-item">
+                                    <?php if($halamanaktif>1) :?>
+                                      <a class="page-link" href="?halaman=<?= $halamanaktif-1; ?>" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                      </a>
+                                    <?php endif ;?>
+                                    <?php for($i=1; $i<=$jumlahhalaman; $i++) :?>
+                                    <?php if($i==$halamanaktif) : ?>
+                                      <a class="page-link" href="?halaman=<?= $i;?>" style="font-weight: bold; color: grey;"> <?= $i; ?> </a>
+                                    <?php else :?>
+                                      <li class="page-item"><a class="page-link" href="?halaman=<?= $i;?>"> <?= $i; ?> </a></li>
+                                        <?php endif; ?>
+                                        <?php endfor; ?>
+                                      </li>
+                                      <li class="page-item">
+                                        <?php if($halamanaktif<$jumlahhalaman) :?>
+                                        <a class="page-link" href="?halaman=<?= $halamanaktif+1; ?>" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                        <?php endif ;?>
+                                    </li>
+                                  </ul>
+                              </nav>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <div class="row">
-                        <div class="col-sm-6">
-                          <div class="form-group">
-                            <label for="username">Username :</label>
-                            <input type="text" name="username" id="username" class="form-control" autocomplete="off" required value="<?= $kt["username"];?>" >
-                          </div>
-                        </div>
-                        <div class="col-sm-6">
-                          <div class="form-group">
-                            <label for="email">Email :</label>
-                            <input type="text" name="email" id="email" class="form-control" autocomplete="off" required value="<?= $kt["email"];?>">
-                          </div>
-                        </div>
-                      </div>
-                      <div class="row">
-                        <div class="col-sm-6">
-                          <div class="form-group">
-                            <label for="username">Jenis Kelamin :</label>
-                            <input type="text" name="jk" id="jk" class="form-control" autocomplete="off" required value="<?= $kt["jk"];?>" >
-                          </div>
-                        </div>
-                        <div class="col-sm-6">
-                          <div class="form-group">
-                            <label for="email">Tanggal lahir :</label>
-                            <input type="date" name="usia" id="usia" class="form-control" autocomplete="off" required value="<?= $kt["tgl_lahir"];?>">
-                          </div>
-                        </div>
-                      </div>
-                      <div class="row">
-                        <div class="col-sm-6">
-                          <div class="form-group">
-                            <label for="password">Password :</label>
-                            <input type="password" name="password" id="password" class="form-control" autocomplete="off" required placeholder="Masukkan Password"> 
-                          </div>
-                        </div>
-                        <div class="col-sm-6">
-                          <div class="form-group">
-                            <label for="password2"> Masukkan Kembali Password :</label>
-                            <input type="password" name="password2" id="password2" class="form-control" autocomplete="off" required placeholder="Masukkan Kembali Password"> 
-                          </div>
-                        </div>
-                      </div>
-                      <button type="submit" name="submit" class="btn btn-info">Ubah Profil</button>
-                    </form>
-              
+
                   </div>
                 </div>
               </div>

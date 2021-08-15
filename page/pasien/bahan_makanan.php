@@ -11,50 +11,36 @@ if( !isset($_SESSION["login"]) ) {
 require '../koneksi.php';
 
 $sql = query("SELECT*FROM bpangan");
-
-/*
-$notfound=false;
-$found=false;
-
+$found = false;
+$truefound= false;
 if(isset($_POST['submit'])){ 
-  $kode_gejala = $_POST['kode_gejala'];
+  $kode_gejala = $_POST['kode_bahan'];
   $jumlah_dipilih = count($kode_gejala);
-  function array_equal($a, $b) {
-    return (
-         is_array($a) 
-         && is_array($b) 
-         && count($a) == count($b) 
-         && array_diff($a, $b) === array_diff($b, $a)
-    );
-}
-  $kode_result=[];
-  $notfound =true;
-  if ($jumlah_dipilih==0){
-    echo "<script>alert('Gejala harus diceklist..!!')</script>";
-  }else{ 
-    $get_penyakit = query("SELECT * FROM penyakit");
-   for ($i=0; $i < count($get_penyakit); $i++) { 
-    $get_rule = query("SELECT kode_gejala,kode_penyakit from basispengetahuan where kode_penyakit='" . $get_penyakit[$i]["kode_penyakit"] . "'");
-    $arr_gejala = [];
-    for ($j=0; $j <count($get_rule) ; $j++) { 
-      array_push($arr_gejala,$get_rule[$j]["kode_gejala"]);
-    }
-    if(array_equal($arr_gejala,$kode_gejala)){
-      $found = true;
-      $notfound=false;
-      $kode_result = $get_penyakit[$i];
-      tambah_result_konsultasi($_SESSION["id_user"],$get_penyakit[$i]["id_penyakit"]);
-    }   
-  }
-  // echo $notfound;
-  //   var_dump($kode_result);
-  // die();
+  $or_filtered = "";
+  $text_search = 'SELECT*FROM bpangan where ';
+  for ($i=0; $i <$jumlah_dipilih ; $i++) { 
+    $var= " \"".$kode_gejala[$i]."\"";
 
-  
+    if($i<$jumlah_dipilih-1){
+      $or_filtered =$or_filtered."kode_bahan=".$var." or ";
+    }
+    if($i == $jumlah_dipilih-1){
+      $or_filtered =$or_filtered."kode_bahan=".$var;
+    }
   }
-  
+
+  // $query = "SELECT*FROM bpangan where ".$or_filtered;
+  $get_data = query($text_search.$or_filtered);
+
+  if(count($get_data) > 0){
+    $found=true;
+  }else{
+    $truefound=true;
+  }
+ 
 }
-*/
+
+
 
 ?>
 
@@ -132,13 +118,19 @@ if(isset($_POST['submit'])){
               </a>
             </li>
             <li class="nav-item">
+              <a class="nav-link" href="bahan_makanan.php">
+                <span class="menu-title">Bahan Makanan</span>
+                <i class="mdi mdi-account-search menu-icon"></i>
+              </a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link" href="konsultasi.php">
                 <span class="menu-title">Konsultasi</span>
                 <i class="mdi mdi-account-search menu-icon"></i>
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="riwayat_diagnosa.php">
+              <a class="nav-link" href="riwayat_diagnosa.php?id=<?= $_SESSION["id_user"];?>">
                 <span class="menu-title">Riwayat Diagnosa</span>
                 <i class="mdi mdi-format-list-bulleted menu-icon"></i>
               </a>
@@ -167,7 +159,7 @@ if(isset($_POST['submit'])){
                   <div class="card-body text-center">
                     <h4 class="card-title">Pilih Bahan Makanan</h4>
                     <hr>
-                    <form action="konsultasi.php" method="post">
+                    <form action="bahan_makanan.php" method="post">
                     <blockquote class="blockquote">
                       <?php foreach($sql as $row) : ?>
                         <div class=" text-justify">
@@ -179,13 +171,64 @@ if(isset($_POST['submit'])){
                       <?php endforeach; ?>
                       </blockquote>
                      
-                      <button type="submit" name="submit" class="btn btn-info">Cek Hasil</button>
+                      <button type="submit" name="submit" class="btn btn-info">Cek </button>
                     </form>
 
                   </div>
                 </div>
               </div>
             </div>
+            <?php if($found){
+
+?>
+
+            <div class="row">
+              <div class="col-12 grid-margin stretch-card">
+                <div class="card">
+                  <div class="card-body text-center">
+
+            <?php if(!$truefound) {?>
+            <table  class="table table-bordered">
+            <tr class="text-center text-light" style="background-color:#2D6187;">
+                            <th>No.</th>
+                            <th>Nama Bahan</th>
+                            <th>Kalori</th>
+                            <th>Lemak</th>
+                            <th>Karbohidrat</th>
+
+                            <th>Protein</th>
+                            <th >keterangan</th>
+                            </tr>
+
+                            <?php $i = 1; ?>
+                            <?php foreach($get_data as $row) : ?>
+                            <tr>
+                            <td class="text-center"><?= $i; ?></td>
+                            <td class="text-center"><?= $row["nama_bahan"];?> </td>
+                            <td class="text-center"><?= $row["kalori"]; ?> </td>
+                            <td class="text-center"><?= $row["lemak"]; ?> </td>
+                            <td class="text-center"><?= $row["karbohidrat"]; ?> </td>
+                            <td class="text-center"><?= $row["protein"]; ?> </td>
+                            <td class="text-justify" style="white-space: pre-wrap;"><?= $row["ket"]; ?> </td>
+
+                            </tr>
+                            <?php $i++; ?>
+                            <?php endforeach; ?>
+                        </table><br><br>
+                        <?php }else{ ?>
+                        <p class="text-center">data not found</p>
+                        <?php } ?>
+
+           
+           
+
+                  </div>
+                </div>
+              </div>
+            </div>
+
+           
+           <?php }; ?> 
           </div>
           <!-- content-wrapper ends -->
 
@@ -196,21 +239,12 @@ if(isset($_POST['submit'])){
           <!-- partial:partials/_footer.html -->
           <footer class="footer">
             <div class="container-fluid clearfix">
-              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © bootstrapdash.com 2020</span>
-              <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Free <a href="https://www.bootstrapdash.com/bootstrap-admin-template/" target="_blank">Bootstrap admin templates </a> from Bootstrapdash.com</span>
+              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block"> <b>Sistem Pakar Metabolik</b> </span>
+              <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> <a href="">By. Fadihah Fitri Nursasi</a> </span>
             </div>
           </footer>
 
-          <script language="JavaScript" type="text/javascript">
-            $(document).ready(function(){
-                $("#myBtn").click(function(){
-                    $("#myModal").modal();
-                });
-            });
-            function checkDiagnosa(){
-                return confirm('Apakah sudah benar gejalanya?');
-            }
-          </script>
+       
           <!-- partial -->
         </div>
         <!-- main-panel ends -->

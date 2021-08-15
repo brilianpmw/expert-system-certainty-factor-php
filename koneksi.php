@@ -1,7 +1,7 @@
 <?php
 
 //koneksi ke db
-$conn = mysqli_connect("localhost", "root", "", "metabolik");
+$conn = mysqli_connect("sql209.epizy.com", "epiz_29132838", "vFeo4yUAVpGWIT", "epiz_29132838_metabolik");
 
 function query($query) {
     global $conn;
@@ -59,14 +59,14 @@ function ubah_user($data) {
       $password = mysqli_real_escape_string($conn, $data["password"]);
       $password2 = mysqli_real_escape_string($conn, $data["password2"]);
       //cek username sudah ada atau belum
-    $result=mysqli_query($conn, "SELECT username FROM user WHERE 
-    username='$username'");
-  if(mysqli_fetch_assoc($result))  {
-  echo "<script>
-      alert('username sudah terdaftar!');
-    </script>";
-  return false;
-  }
+      $result=mysqli_query($conn, "SELECT username FROM user WHERE 
+          username='$username'");
+        if(mysqli_fetch_assoc($result))  {
+        echo "<script>
+            alert('username sudah terdaftar!');
+          </script>";
+        return false;
+        }
       //konfirmasi password
       if($password !== $password2) {
         echo "<script>
@@ -201,7 +201,6 @@ function cari_penyakit($keyword) {
   return query($query);
 }
 
-
 //hapus penyakit
 function hapus_penyakit($id_penyakit) {
   global $conn;
@@ -277,10 +276,9 @@ function cari_riwayat($keyword) {
 
 //cari
 function cari_rule($keyword) {
-  $query="SELECT penyakit.nama_penyakit,gejala.nama_gejala, basispengetahuan.mb, basispengetahuan.md, basispengetahuan.id_rule, basispengetahuan.kode_rule, basispengetahuan.kode_penyakit, basispengetahuan.kode_gejala
-  FROM penyakit, gejala, basispengetahuan
+  $query="SELECT penyakit.nama_penyakit, gejala.nama_gejala
+  FROM penyakit, basispengetahuan
     WHERE penyakit.kode_penyakit=basispengetahuan.kode_penyakit
-      AND gejala.kode_gejala=basispengetahuan.kode_gejala
           AND nama_penyakit LIKE '%$keyword%'
         ";
   return query($query);
@@ -300,48 +298,32 @@ return mysqli_affected_rows($conn);
 //tambah resep
 function tambah_rule($data) {
   global $conn;
+  
   //ambil data dari tiap elemen dalam form
-    $kode_rule = htmlspecialchars($data["kode_rule"]);
-    $kode_penyakit = $data["penyakit"];
-    $kode_gejala = $data["gejala"];
-    $mb=$data["mb"];
-    $md=$data["md"];
-    //cek kode rule sudah ada atau belum
-    $result=mysqli_query($conn, "SELECT kode_rule FROM basispengetahuan WHERE 
-    kode_rule='$kode_rule'");
-    if(mysqli_fetch_assoc($result))  {
-    echo "<script>
-      alert('Kode bahan sudah Terdaftar :) ');
-    </script>";
-    return false;
+    $kode_penyakit = $data["kode_penyakit"];
+    $kode_gejala = $data["kode_gejala"];
+    $jumlah_dipilih = count($kode_gejala);
+    if (count($kode_gejala)==0) {
+      echo '<script language="javascript">';
+      echo 'alert("Pilih gejala..!!")';
+      echo '</script>';
+      return false;
     }
-    $query = "INSERT INTO basispengetahuan
-              VALUES
-              ('', '$kode_rule', '$kode_penyakit', '$kode_gejala', '$mb', '$md')
-            ";
-  mysqli_query($conn, $query);
-return mysqli_affected_rows($conn);
+    $delete = "DELETE FROM basispengetahuan WHERE kode_penyakit='$kode_penyakit'";
+    mysqli_query($conn, $delete);
+    for($x=0;$x<$jumlah_dipilih;$x++) {
+      $query = "INSERT INTO basispengetahuan
+                  VALUES
+                  (null,'$kode_gejala[$x]', '$kode_penyakit')
+                ";
+      mysqli_query($conn, $query);
     }
+   
 
-//ubah gejala
-function ubah_rule($data) {
-  global $conn;
-      $id_rule = $data["id_rule"];
-      $kode_rule = htmlspecialchars($data["kode_rule"]);
-      $kode_penyakit = htmlspecialchars($data["penyakit"]);
-      $kode_gejala = htmlspecialchars($data["gejala"]);
-      $mb = htmlspecialchars($data["mb"]);
-      $md = htmlspecialchars($data["md"]);
-    $query = "UPDATE basispengetahuan SET 
-                kode_rule = '$kode_rule',
-                kode_penyakit = '$kode_penyakit',
-                kode_gejala = '$kode_gejala',
-                mb = '$mb',
-                md = '$md'
-              WHERE id_rule=$id_rule
-              ";
-    mysqli_query($conn, $query);
+
   return mysqli_affected_rows($conn);
+
+    
 }
 
 //hapus rule

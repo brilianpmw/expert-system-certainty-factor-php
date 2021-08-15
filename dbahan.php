@@ -4,7 +4,7 @@ require 'page/koneksi.php';
 
 //ambil data di url
 $id_bahan=$_GET["id"];
-var_dump($id_bahan);
+
 //query data berdasarkan id
 $kt = query("SELECT * FROM bpangan WHERE id_bahan=$id_bahan")[0];
 
@@ -115,7 +115,7 @@ $kt = query("SELECT * FROM bpangan WHERE id_bahan=$id_bahan")[0];
             <tr class="text-center text-light" style="background-color:#2D6187;">
               <th>Informasi Bahan Makanan - <?= $kt["nama_bahan"];?></th>
             </tr>
-            <tr class="text-center">
+            <tr class="text-justify rowfd">
               <td><?= $kt["ket"];?> </td>
             </tr>
           </table>
@@ -131,7 +131,7 @@ $kt = query("SELECT * FROM bpangan WHERE id_bahan=$id_bahan")[0];
     <div class="container d-md-flex py-4">
       <div class="mr-md-auto text-center text-md-left">
         <div class="copyright">
-          &copy; Copyright <strong> | <span>Sistem Pakar Metabolik</span></strong>
+           <strong><span>Sistem Pakar Metabolik</span></strong>
         </div>
         <div class="credits">
            <p> By. Fadihah Fitri N </p>

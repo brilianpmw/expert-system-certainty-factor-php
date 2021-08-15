@@ -4,7 +4,7 @@ require 'page/koneksi.php';
 
 //ambil data di url
 $id_penyakit=$_GET["id"];
-var_dump($id_penyakit);
+
 //query data berdasarkan id
 $kt = query("SELECT * FROM penyakit WHERE id_penyakit=$id_penyakit")[0];
 
@@ -145,7 +145,7 @@ $kt = query("SELECT * FROM penyakit WHERE id_penyakit=$id_penyakit")[0];
     <div class="container d-md-flex py-4">
       <div class="mr-md-auto text-center text-md-left">
         <div class="copyright">
-          &copy; Copyright <strong> | <span>Sistem Pakar Metabolik</span></strong>
+           <strong><span>Sistem Pakar Metabolik</span></strong>
         </div>
         <div class="credits">
            <p> By. Fadihah Fitri N </p>

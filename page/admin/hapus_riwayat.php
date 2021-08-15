@@ -11,18 +11,18 @@ require '../koneksi.php';
 
 $id = $_GET["id"];
 
-if( hapus_user($id) > 0 ) {
+if( hapus_riwayat($id) > 0 ) {
   echo "
       <script>
         alert('data berhasil dihapus!');
-        document.location.href = 'index_admin.php';
+        document.location.href = 'riwayat_diagnosa.php';
       </script>  
     ";
 } else {
   echo "
       <script>
         alert('data gagal dihapus!');
-        document.location.href = 'index_admin.php';
+        document.location.href = 'riwayat_diagnosa.php';
       </script>  
     ";
 }

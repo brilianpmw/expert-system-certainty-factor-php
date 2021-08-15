@@ -1,7 +1,6 @@
 <?php
 
 session_start();
-$con = mysqli_connect("localhost", "root", "", "metabolik");
 
 if( !isset($_SESSION["login"]) ) {
     header("Location: ../../login/login_admin.php");
@@ -10,44 +9,21 @@ if( !isset($_SESSION["login"]) ) {
 
 require '../koneksi.php';
 
-$jumlahdataperhalaman = 10;
+$jumlahdataperhalaman = 5;
 $jumlahdata = count(query("SELECT*FROM basispengetahuan"));
 $jumlahhalaman = ceil($jumlahdata/$jumlahdataperhalaman);
 $halamanaktif = (isset($_GET["halaman"])) ? $_GET["halaman"]:1;
 $awaldata = ($jumlahdataperhalaman * $halamanaktif) - $jumlahdataperhalaman;
-$list_data = '';
-$q = "select * from penyakit order by kode_penyakit LIMIT $awaldata, $jumlahdataperhalaman";
-$q = mysqli_query($con, $q);
-$no = 0;
 
-if (mysqli_num_rows($q) > 0) {
-    while ($r = mysqli_fetch_array($q)) {
-      $no++;
-
-
-        $id = $r['kode_penyakit'];
-        $gejala = array();
-        $qgejala = "select * from basispengetahuan where kode_penyakit='$id'"; //ambil data gejala dari tabel rule
-        $qgejala = mysqli_query($con, $qgejala);
-        while ($rgejala = mysqli_fetch_array($qgejala)) { //perulangan untuk menampung data gejala
-            $r_gejala = mysqli_fetch_array(mysqli_query($con, "select kode_gejala from gejala where kode_gejala='" . $rgejala['kode_gejala'] . "'"));
-            $gejala[] = $r_gejala['kode_gejala'];
-        }
-        $daftar_gejala = implode(" - ", $gejala); //satukan data gejala dan tambahkan pemisah "-"
-        $list_data .= '
-		<tr>
-		<td>'.$no.'</td>
-		<td>' . $r['nama_penyakit'] . '</td>
-		<td>' . $daftar_gejala . '</td>
-		<td>
-		<a href="tambah_aturan.php?id_penyakit='. $r['id_penyakit'] .'" class="btn btn-success btn-xs" title="Ubah"><i class="fa fa-edit"></i> Ubah</a> &nbsp;
-		</tr>';
-
-    }
-}
+$rule = query("SELECT penyakit.nama_penyakit,gejala.nama_gejala, basispengetahuan.mb, basispengetahuan.md, basispengetahuan.id_rule, basispengetahuan.kode_rule, basispengetahuan.kode_penyakit, basispengetahuan.kode_gejala
+              FROM penyakit, gejala, basispengetahuan
+                WHERE penyakit.kode_penyakit=basispengetahuan.kode_penyakit
+                  AND gejala.kode_gejala=basispengetahuan.kode_gejala
+                  ORDER BY id_rule asc LIMIT $awaldata, $jumlahdataperhalaman
+            ");
 //tombol cari diklik
 if ( isset($_POST["cari_rule"]) ) {
-  $drule=cari_rule($_POST["keyword"]);
+  $rule=cari_rule($_POST["keyword"]);
 }
 ?>
 
@@ -139,7 +115,7 @@ if ( isset($_POST["cari_rule"]) ) {
             </li>
             <li class="nav-item">
               <a class="nav-link" href="dpangan.php">
-                <span class="menu-title">Data Bahan Pangan</span>
+                <span class="menu-title">Data Bahan Makanan</span>
                 <i class="mdi mdi-file-document menu-icon"></i>
               </a>
             </li>
@@ -157,7 +133,7 @@ if ( isset($_POST["cari_rule"]) ) {
             </li>
             <li class="nav-item">
               <a class="nav-link" href="edit_profil_dokter.php?id=<?= $_SESSION["id_user"];?>">
-                <span class="menu-title">Lihat Profil</span>
+                <span class="menu-title">Profil</span>
                 <i class="mdi mdi-autorenew menu-icon"></i>
               </a>
             </li>
@@ -177,29 +153,46 @@ if ( isset($_POST["cari_rule"]) ) {
               <div class="col-12 grid-margin stretch-card">
                 <div class="card">
                   <div class="card-body text-center">
-                    <h4 class="card-title">Data Aturan</h4>
+                    <h4 class="card-title">Data Aturan / Rule</h4>
                     <hr>
                     
                     <nav class="navbar navbar-light ">
-                    <a class=""></a>
+                    <a class=" btn btn-outline-info mdi mdi-file btn-icon-prepend" href="tambah_aturan.php">Tambah</a>
+
                       <form class="form-inline" action="" method="post">
-                        <input class="form-control mr-sm-2" type="text" placeholder="Nama Penyakit.." name="keyword"  autocomplete="off" autofocus>
+                        <input class="form-control mr-sm-2" type="text" placeholder="Cari Nama Penyakit.." name="keyword"  autocomplete="off" autofocus>
                         <button class="btn btn-outline-info my-2 my-sm-0" type="submit" name="cari_rule">Cari</button>
                       </form>
                     </nav><br>
 
                         <table class="table table-bordered">
-                            <tr class="table-info text-center">
+                            <tr class="text-center text-light" style="background-color:#2D6187;">
                             <th>No.</th>
+                            <th>Kode Rule</th>
                             <th>Nama Penyakit</th>
-                            <th>kode Gejala</th>
+                            <th>Nama Gejala</th>
+                            <th>MB</th>
+                            <th>MD</th>
                             <th>Aksi</th>
                             </tr>
 
-                            <tbody>
-                    <?php echo $list_data; ?>
-                </tbody>
-                        </table> <br><br>
+                            <?php $i = 1; ?>
+                            <?php foreach($rule as $row) : ?>
+                            <tr>
+                            <td class="text-center"><?= $i; ?></td>
+                            <td class="text-left"><?= $row["kode_rule"]; ?> </td>
+                            <td class="text-left"><?= $row["nama_penyakit"]; ?> </td>
+                            <td class="text-left"><?= $row["nama_gejala"];?> </td>
+                            <td class="text-center"><?= $row["mb"];?> </td>
+                            <td class="text-center"><?= $row["md"];?> </td>
+                            <td class="text-center">
+                              <a href="ubah_aturan.php?id=<?= $row["id_rule"];?>" class="mdi mdi-autorenew"> Ubah</a> |
+                              <a href="hapus_aturan.php?id=<?= $row["id_rule"];?>" onclick=" return confirm('Yakin ingin menghapus data ?');">Hapus<a class="mdi mdi-delete"></a></a>
+                            </td>
+                            </tr>
+                            <?php $i++; ?>
+                            <?php endforeach; ?>
+                        </table><br><br>
 
                         <!--navigasi-->
                         <div class="container">
@@ -243,8 +236,8 @@ if ( isset($_POST["cari_rule"]) ) {
           <!-- partial:partials/_footer.html -->
           <footer class="footer">
             <div class="container-fluid clearfix">
-              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © bootstrapdash.com 2020</span>
-              <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Free <a href="https://www.bootstrapdash.com/bootstrap-admin-template/" target="_blank">Bootstrap admin templates </a> from Bootstrapdash.com</span>
+              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block"> <b>Sistem Pakar Metabolik</b> </span>
+              <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> <a href="">By. Fadihah Fitri Nursasi</a> </span>
             </div>
           </footer>
           <!-- partial -->

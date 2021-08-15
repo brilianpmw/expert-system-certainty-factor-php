@@ -1,60 +1,37 @@
 <?php
 
 session_start();
+
+if( !isset($_SESSION["login"]) ) {
+    header("Location: ../../login/login_admin.php");
+    exit;
+}
+
 require '../koneksi.php';
+
+//cek apakah tombol submit sudah ditekan atau belum
 if( isset($_POST["submit"]) ) {
-  // cek apakah data berhasil ditambahkan atau tidak
+
+  //cek apakah data berhasil diubah atau tidak
   if (tambah_rule ($_POST) > 0 ) {
     echo "
       <script>
-        alert('data berhasil di update!');
+        alert('Data Berhasil Ditambahkan !');
         document.location.href = 'daturan.php';
       </script>  
     ";
   } else {
     echo "
       <script>
-        alert('data gagal ditambah!');
+        alert('Silahkan Input Data kembali !');
         document.location.href = 'daturan.php';
       </script>  
     ";
   
   }
-}
-if( !isset($_SESSION["login"]) ) {
-    header("Location: ../../login/login_admin.php");
-    exit;
-}
+  
 
-if(!$_GET['id_penyakit']){
-  echo "
-  <script>
-    document.location.href = 'daturan.php';
-  </script>  
-";
 }
-$get_penyakit = query("select * from penyakit where id_penyakit='" . $_GET['id_penyakit'] . "'");
-if(count($get_penyakit) == 0){
-  echo "
-  <script>
-    document.location.href = 'daturan.php';
-  </script>  
-  ";
-}
-
-
-$get_gejala_uniq = query("select kode_gejala from basispengetahuan where kode_penyakit='" . $get_penyakit[0]['kode_penyakit'] . "'");
-$dgejala = query("SELECT*FROM gejala");
-$arr_gejala = [];
-for($i=0;$i<count($get_gejala_uniq);$i++){
-array_push($arr_gejala,$get_gejala_uniq[$i]["kode_gejala"]);
-}
-// var_dump($get_gejala_uniq);
-// var_dump($dgejala);
-// echo((in_array('G001',$arr_gejala)));
-// die();
-//cek apakah tombol submit sudah ditekan atau belum
-
 
 ?>
 
@@ -120,7 +97,7 @@ array_push($arr_gejala,$get_gejala_uniq[$i]["kode_gejala"]);
                 </div>
                 <div class="nav-profile-text d-flex flex-column">
                   <span class="font-weight-bold mb-2"> <?php echo $_SESSION["username"]; ?> </span>
-                  <span class="text-secondary text-small"> <?php echo $_SESSION["level"]; ?> </span>
+                  <span class="text-secondary text-small"> <?php echo $_SESSION["role"]; ?> </span>
                 </div>
                 <i class="mdi mdi-bookmark-check text-success nav-profile-badge"></i>
               </a>
@@ -144,6 +121,12 @@ array_push($arr_gejala,$get_gejala_uniq[$i]["kode_gejala"]);
               </a>
             </li>
             <li class="nav-item">
+              <a class="nav-link" href="dpangan.php">
+                <span class="menu-title">Data Bahan Makanan</span>
+                <i class="mdi mdi-file-document menu-icon"></i>
+              </a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link" href="daturan.php">
                 <span class="menu-title">Data Aturan</span>
                 <i class="mdi mdi-settings menu-icon"></i>
@@ -157,7 +140,7 @@ array_push($arr_gejala,$get_gejala_uniq[$i]["kode_gejala"]);
             </li>
             <li class="nav-item">
               <a class="nav-link" href="edit_profil_dokter.php?id=<?= $_SESSION["id_user"];?>">
-                <span class="menu-title">Lihat Profil</span>
+                <span class="menu-title">Profil</span>
                 <i class="mdi mdi-autorenew menu-icon"></i>
               </a>
             </li>
@@ -177,48 +160,69 @@ array_push($arr_gejala,$get_gejala_uniq[$i]["kode_gejala"]);
               <div class="col-12 grid-margin stretch-card">
                 <div class="card">
                   <div class="card-body text-center">
-                    <h4 class="card-title">Recent Updates</h4>
-                    <hr><br>
+                    <h4 class="card-title">Tambah Data Penyakit</h4>
+                    <hr><br><br>
 
-                    <form action="tambah_aturan.php" id="form1" name="form1" method="post" enctype="multipart/form-data">
-                        <div class="form-group">
-                            <input readonly="readonly"   type="text" name="kode_penyakit" value="<?php echo $get_penyakit[0]['kode_penyakit']; ?>" id="kode_penyakit" class="form-control" autocomplete="off" placeholder="kode penyakit"> 
-                        </div>
-                        <div class="form-group">
-                            <input readonly="readonly"  type="text" name="nama_" value="<?php echo $get_penyakit[0]['nama_penyakit']; ?>" id="nama_p" class="form-control" autocomplete="off" placeholder="nama penyakit"> 
-                        </div>
-                        <!-- <select required class="form-control" name="kode_penyakit">
-                        <option value="">------------- PILIH PENYAKIT -------------</option>
-                            <?php
-                            $sql = "SELECT * FROM penyakit";
-                            $result1 = mysqli_query($conn, $sql);
-                            
-                                while ($row = mysqli_fetch_array($result1)) {
-                                  echo "<option value='".$row['kode_penyakit']."'>".$row['kode_penyakit']." ".$row['nama_penyakit']."</option>";
-                                
-                                }
-                                
-                            ?>
-                        </select><br> -->
-                        
-                        <blockquote class="blockquote">
-                      <?php foreach($dgejala as $row) : ?>
-                        <div class=" text-justify">
-                          <div class="form-check form-check-info">
-                            <label class="form-check-label">
-                            <input <?php 
-                            if((in_array($row["kode_gejala"],$arr_gejala))){
-                              echo "checked";
-                            }   ?> type="checkbox" class="form-check-input" name="kode_gejala[]" value="<?=$row["kode_gejala"] ?>"> <?= $row["nama_gejala"]; ?> </label>
+                    <form action="" method="post" enctype="multipart/form-data">
+
+                    
+                      <div class="row text-center">
+                        <div class="col-sm-12">
+                          <div class="form-group">
+                            <label for="kode_rule"><h5>Kode Rule :</h5></label>
+                            <input type="text" name="kode_rule" id="kode_rule" class="form-control" autocomplete="off" placeholder="Mis : R001" > 
                           </div>
                         </div>
-                      <?php endforeach; ?>
-                      </blockquote>
+                      </div>
+                  
 
-                        
-                        <button type="submit" name="submit" class="btn btn-info">Update rule</button>
+                    <select class="form-control" name="penyakit">
+                        <option>------ Pilih Penyakit ------</option>
+                          <?php
+                            $sql = "SELECT * FROM penyakit";
+                            $result = mysqli_query($conn, $sql);
+                            if(mysqli_num_rows($result)!='') {
+                              while ($data = mysqli_fetch_array($result)) {
+                                ?>
+                                <option value="<?php echo $data[1]?>"><?php echo $data[2]?></option>
+                                <?php
+                                }
+                              }
+                          ?>
+                      </select><br>
+                      
+                      <select class="form-control" name="gejala">
+                        <option>------ Pilih Gejala ------</option>
+                          <?php
+                            $sql = "SELECT * FROM gejala";
+                            $result = mysqli_query($conn, $sql);
+                            if(mysqli_num_rows($result)!='') {
+                              while ($data = mysqli_fetch_array($result)) {
+                                ?>
+                                <option value="<?php echo $data[1]?>"><?php echo $data[2]?></option>
+                                <?php
+                                }
+                              }
+                          ?>
+                      </select><br>
+
+                      <div class="row">
+                        <div class="col-sm-6">
+                          <div class="form-group">
+                            <label for="kode_gejala">Nilai MB :</label>
+                            <input type="text" name="mb" id="mb" class="form-control" autocomplete="off" placeholder="Mis : G001"> 
+                        </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="nama_gejala">Nilai MD :</label>
+                                <input type="text" name="md" id="md" class="form-control" autocomplete="off" placeholder="Masukkan Nama gejala"> 
+                              </div>
+                        </div>
+                      </div>
+                    
+                      <button type="submit" name="submit" class="btn btn-info">Tambah Data Aturan</button>
                     </form>
-
                   </div>
                 </div>
               </div>
@@ -228,8 +232,8 @@ array_push($arr_gejala,$get_gejala_uniq[$i]["kode_gejala"]);
           <!-- partial:partials/_footer.html -->
           <footer class="footer">
             <div class="container-fluid clearfix">
-              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © bootstrapdash.com 2020</span>
-              <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Free <a href="https://www.bootstrapdash.com/bootstrap-admin-template/" target="_blank">Bootstrap admin templates </a> from Bootstrapdash.com</span>
+              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block"> <b>Sistem Pakar Metabolik</b> </span>
+              <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> <a href="">By. Fadihah Fitri Nursasi</a> </span>
             </div>
           </footer>
           <!-- partial -->

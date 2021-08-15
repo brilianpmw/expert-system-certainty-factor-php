@@ -10,32 +10,32 @@ if( !isset($_SESSION["login"]) ) {
 require '../koneksi.php';
 
 //ambil data di url
-$id_user=$_GET["id"];
-var_dump($id_user);
+$id_rule=$_GET["id"];
 //query data berdasarkan id
-$kt = query("SELECT * FROM user WHERE id_user=$id_user")[0];
+$kt = query("SELECT * FROM basispengetahuan WHERE id_rule=$id_rule")[0];
+
 
 //cek apakah tombol submit sudah ditekan atau belum
 if( isset($_POST["submit"]) ) {
 
   //cek apakah data berhasil diubah atau tidak
-  if (ubah_user ($_POST) > 0 ) {
+  if (ubah_rule ($_POST) > 0 ) {
     echo "
       <script>
-        alert('Selamat, Data Anda telah Tersimpan :) ');
-        document.location.href = '';
+        alert('Data Berhasil Diubah !');
+        document.location.href = 'daturan.php';
       </script>  
     ";
   } else {
     echo "
       <script>
-        alert('Data gagal ditambah!');
-        document.location.href = '';
+        alert('Silahkan Input Data kembali !');
+        document.location.href = 'daturan.php';
       </script>  
     ";
+  
   }
 }
-
 
 ?>
 
@@ -155,7 +155,7 @@ if( isset($_POST["submit"]) ) {
           <div class="content-wrapper">
             <div class="page-header">
               <h3 class="page-title">
-                <span class="page-title-icon bg-gradient-danger text-white mr-2">
+                <span class="page-title-icon bg-gradient-info text-white mr-2">
                   <i class="mdi mdi-home"></i>
                 </span> Dashboard
               </h3>
@@ -164,66 +164,69 @@ if( isset($_POST["submit"]) ) {
               <div class="col-12 grid-margin stretch-card">
                 <div class="card">
                   <div class="card-body text-center">
-                    <h4 class="card-title">Lengkapi Profil Anda</h4>
+                    <h4 class="card-title">Ubah Gejala</h4>
                     <hr><br><br>
 
                     <form action="" method="post" enctype="multipart/form-data">
-                    <input type="hidden" name="id_user" value="<?= $kt["id_user"]; ?>">
-                    <input type="hidden" name="role" value="<?= $kt["role"]; ?>">
-                    
-                      <div class="row">
+                    <input type="hidden" name="id_rule" value="<?= $kt["id_rule"]; ?>">
+
+                    <div class="row text-center">
                         <div class="col-sm-12">
                           <div class="form-group">
-                            <label for="nama">Nama : </label>
-                            <input type="text" name="nama" id="nama" class="form-control" autocomplete="off" required value="<?= $kt["nama"];?>" >
+                            <label for="kode_rule"><h5>Kode Rule :</h5></label>
+                            <input type="text" name="kode_rule" id="kode_rule" class="form-control" readonly value="<?= $kt["kode_gejala"];?>"> 
                           </div>
                         </div>
                       </div>
+                  
+
+                    <select class="form-control" name="penyakit">
+                        <option>------ Pilih Penyakit ------</option>
+                          <?php
+                            $sql = "SELECT * FROM penyakit";
+                            $result = mysqli_query($conn, $sql);
+                            if(mysqli_num_rows($result)!='') {
+                              while ($data = mysqli_fetch_array($result)) {
+                                ?>
+                                <option value="<?php echo $data[1]?>"><?php echo $data[2]?></option>
+                                <?php
+                                }
+                              }
+                          ?>
+                      </select><br>
+                      
+                      <select class="form-control" name="gejala">
+                        <option>------ Pilih Gejala ------</option>
+                          <?php
+                            $sql = "SELECT * FROM gejala";
+                            $result = mysqli_query($conn, $sql);
+                            if(mysqli_num_rows($result)!='') {
+                              while ($data = mysqli_fetch_array($result)) {
+                                ?>
+                                <option value="<?php echo $data[1]?>"><?php echo $data[2]?></option>
+                                <?php
+                                }
+                              }
+                          ?>
+                      </select><br>
+
                       <div class="row">
                         <div class="col-sm-6">
                           <div class="form-group">
-                            <label for="username">Username :</label>
-                            <input type="text" name="username" id="username" class="form-control" autocomplete="off" required value="<?= $kt["username"];?>" >
-                          </div>
+                            <label for="kode_gejala">Nilai MB :</label>
+                            <input type="text" name="mb" id="mb" class="form-control" value="<?= $kt["mb"];?>"> 
+                        </div>
                         </div>
                         <div class="col-sm-6">
-                          <div class="form-group">
-                            <label for="email">Email :</label>
-                            <input type="text" name="email" id="email" class="form-control" autocomplete="off" required value="<?= $kt["email"];?>">
-                          </div>
+                            <div class="form-group">
+                                <label for="nama_gejala">Nilai MD :</label>
+                                <input type="text" name="md" id="md" class="form-control" value="<?= $kt["md"];?>"> 
+                              </div>
                         </div>
                       </div>
-                      <div class="row">
-                        <div class="col-sm-6">
-                          <div class="form-group">
-                            <label for="username">Jenis Kelamin :</label>
-                            <input type="text" name="jk" id="jk" class="form-control" autocomplete="off" required value="<?= $kt["jk"];?>" >
-                          </div>
-                        </div>
-                        <div class="col-sm-6">
-                          <div class="form-group">
-                            <label for="email">Tanggal lahir :</label>
-                            <input type="date" name="usia" id="usia" class="form-control" autocomplete="off" required value="<?= $kt["tgl_lahir"];?>">
-                          </div>
-                        </div>
-                      </div>
-                      <div class="row">
-                        <div class="col-sm-6">
-                          <div class="form-group">
-                            <label for="password">Password :</label>
-                            <input type="password" name="password" id="password" class="form-control" autocomplete="off" required placeholder="Masukkan Password"> 
-                          </div>
-                        </div>
-                        <div class="col-sm-6">
-                          <div class="form-group">
-                            <label for="password2"> Masukkan Kembali Password :</label>
-                            <input type="password" name="password2" id="password2" class="form-control" autocomplete="off" required placeholder="Masukkan Kembali Password"> 
-                          </div>
-                        </div>
-                      </div>
-                      <button type="submit" name="submit" class="btn btn-info">Ubah Profil</button>
+                    
+                      <button type="submit" name="submit" class="btn btn-info">Ubah Rule</button>
                     </form>
-              
                   </div>
                 </div>
               </div>
