@@ -286,14 +286,15 @@ function cari_rule($keyword) {
   return query($query);
 }
 
-function tambah_result_konsultasi($id_user,$id_penyakit) {
+function tambah_result_konsultasi($id_user,$id_penyakit,$presentasi) {
   global $conn;
  $curr_date = date("Y-m-d");
   $query = "INSERT INTO hasilkonsultasi
               VALUES
-              ('', '$id_user', '$id_penyakit', '$curr_date')
+              (null, $id_user, $id_penyakit, '$curr_date','$presentasi')
             ";
-  mysqli_query($conn, $query);
+   mysqli_query($conn, $query);
+  
 return mysqli_affected_rows($conn);
 }
 

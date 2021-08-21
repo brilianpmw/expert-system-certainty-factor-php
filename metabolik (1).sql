@@ -1,13 +1,14 @@
 -- phpMyAdmin SQL Dump
--- version 5.0.2
+-- version 4.9.2
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Aug 15, 2021 at 09:28 AM
--- Server version: 10.4.14-MariaDB
--- PHP Version: 7.4.10
+-- Host: localhost:3307
+-- Generation Time: Aug 22, 2021 at 02:40 AM
+-- Server version: 8.0.18
+-- PHP Version: 7.3.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -34,7 +35,7 @@ CREATE TABLE `basispengetahuan` (
   `kode_gejala` varchar(5) NOT NULL,
   `mb` varchar(5) NOT NULL,
   `md` varchar(5) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `basispengetahuan`
@@ -81,7 +82,7 @@ CREATE TABLE `bpangan` (
   `karbohidrat` varchar(12) NOT NULL,
   `protein` varchar(12) NOT NULL,
   `ket` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `bpangan`
@@ -155,7 +156,7 @@ CREATE TABLE `gejala` (
   `id_gejala` int(5) NOT NULL,
   `kode_gejala` varchar(5) NOT NULL,
   `nama_gejala` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `gejala`
@@ -192,22 +193,24 @@ CREATE TABLE `hasilkonsultasi` (
   `id_konsultasi` int(11) NOT NULL,
   `id_user` int(11) NOT NULL,
   `id_penyakit` int(11) NOT NULL,
-  `tanggal` date NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `tanggal` date NOT NULL,
+  `presentation` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `hasilkonsultasi`
 --
 
-INSERT INTO `hasilkonsultasi` (`id_konsultasi`, `id_user`, `id_penyakit`, `tanggal`) VALUES
-(1, 28, 1, '2021-07-10'),
-(4, 28, 1, '2021-07-14'),
-(36, 28, 1, '2021-07-15'),
-(38, 28, 6, '2021-07-30'),
-(39, 27, 1, '2021-08-01'),
-(40, 28, 1, '2021-08-14'),
-(41, 28, 1, '2021-08-14'),
-(42, 28, 1, '2021-08-14');
+INSERT INTO `hasilkonsultasi` (`id_konsultasi`, `id_user`, `id_penyakit`, `tanggal`, `presentation`) VALUES
+(1, 28, 1, '2021-07-10', ''),
+(4, 28, 1, '2021-07-14', ''),
+(36, 28, 1, '2021-07-15', ''),
+(38, 28, 6, '2021-07-30', ''),
+(39, 27, 1, '2021-08-01', ''),
+(40, 28, 1, '2021-08-14', ''),
+(41, 28, 1, '2021-08-14', ''),
+(42, 28, 1, '2021-08-14', ''),
+(43, 28, 4, '2021-08-22', '100');
 
 -- --------------------------------------------------------
 
@@ -223,7 +226,7 @@ CREATE TABLE `penyakit` (
   `keterangan` text NOT NULL,
   `solusi` text NOT NULL,
   `penyebab` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `penyakit`
@@ -248,7 +251,7 @@ CREATE TABLE `pesan` (
   `email` varchar(40) NOT NULL,
   `subjek` text NOT NULL,
   `pesan` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `pesan`
@@ -275,7 +278,7 @@ CREATE TABLE `user` (
   `password` varchar(255) NOT NULL,
   `role` varchar(10) DEFAULT NULL,
   `tgl_lahir` date DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `user`
@@ -359,7 +362,7 @@ ALTER TABLE `gejala`
 -- AUTO_INCREMENT for table `hasilkonsultasi`
 --
 ALTER TABLE `hasilkonsultasi`
-  MODIFY `id_konsultasi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `id_konsultasi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT for table `penyakit`

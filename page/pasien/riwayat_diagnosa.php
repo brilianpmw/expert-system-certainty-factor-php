@@ -15,11 +15,11 @@ $jumlahhalaman = ceil($jumlahdata/$jumlahdataperhalaman);
 $halamanaktif = (isset($_GET["halaman"])) ? $_GET["halaman"]:1;
 $awaldata = ($jumlahdataperhalaman * $halamanaktif) - $jumlahdataperhalaman;
 
-$dhk = query("SELECT user.nama, penyakit.nama_penyakit, hasilkonsultasi.tanggal, hasilkonsultasi.id_konsultasi
+$dhk = query("SELECT user.nama, penyakit.nama_penyakit, hasilkonsultasi.tanggal,hasilkonsultasi.presentation, hasilkonsultasi.id_konsultasi
               FROM user, penyakit, hasilkonsultasi 
                 WHERE user.id_user=hasilkonsultasi.id_user 
                   AND penyakit.id_penyakit=hasilkonsultasi.id_penyakit 
-                  AND user.id_user = '".$_SESSION["id_user"]."'");
+                  AND user.id_user = '".$_SESSION["id_user"]."' ORDER BY DATE(tanggal) DESC") ;
 
 ?>
 
@@ -150,6 +150,8 @@ $dhk = query("SELECT user.nama, penyakit.nama_penyakit, hasilkonsultasi.tanggal,
                             <th>No.</th>
                             <th>Nama Pasien</th>
                             <th>Nama penyakit</th>
+                            <th>Presentase</th>
+
                             <th>Tanggal</th>
                             <th>Aksi</th>
                             </tr>
@@ -160,7 +162,10 @@ $dhk = query("SELECT user.nama, penyakit.nama_penyakit, hasilkonsultasi.tanggal,
                             <td><?= $i; ?></td>
                             <td><?= $row["nama"]; ?> </td>
                             <td><?= $row["nama_penyakit"];?> </td>
+                            <td><?= $row["presentation"]; ?> </td>
+
                             <td><?= $row["tanggal"]; ?> </td>
+
                             <td>
                               <a href="hapus_riwayat.php?id=<?= $row["id_konsultasi"];?>" onclick=" return confirm('Yakin ingin menghapus data ?');">Hapus<a class="mdi mdi-delete"></a></a>
                             </td>

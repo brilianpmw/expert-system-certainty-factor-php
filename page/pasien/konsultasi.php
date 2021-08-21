@@ -14,45 +14,111 @@ $sql = query("SELECT*FROM gejala");
 
 $notfound=false;
 $found=false;
+$search = false;
 
 if(isset($_POST['submit'])){ 
   $kode_gejala = $_POST['kode_gejala'];
   $jumlah_dipilih = count($kode_gejala);
-  function array_equal($a, $b) {
-    return (
-         is_array($a) 
-         && is_array($b) 
-         && count($a) == count($b) 
-         && array_diff($a, $b) === array_diff($b, $a)
-    );
-}
-  $kode_result=[];
-  $notfound =true;
+
+
+  
   if ($jumlah_dipilih==0){
     echo "<script>alert('Gejala harus diceklist..!!')</script>";
-  }else{ 
-    $get_penyakit = query("SELECT * FROM penyakit");
-   for ($i=0; $i < count($get_penyakit); $i++) { 
-    $get_rule = query("SELECT kode_gejala,kode_penyakit from basispengetahuan where kode_penyakit='" . $get_penyakit[$i]["kode_penyakit"] . "'");
-    $arr_gejala = [];
-    for ($j=0; $j <count($get_rule) ; $j++) { 
-      array_push($arr_gejala,$get_rule[$j]["kode_gejala"]);
+
+  }else{    
+    $search = true;
+
+    $new_data = [];
+     $list_disease = query("SELECT*FROM basispengetahuan where kode_gejala IN ('" . implode("','",$kode_gejala) . "')");
+    for ($i=0; $i < count($list_disease); $i++) {
+      $arr_gejala_uniq = [];
+      $first = $list_disease[$i] ;
+      $found = false;
+      $index=-1;
+      $joined=[];
+      for ($j=0; $j <count($new_data) ; $j++) { 
+        $check = $new_data[$j];
+        if($check["kode_penyakit"] == $first['kode_penyakit']) {
+          $found = true;
+          $index = $j;
+          array_push($arr_gejala_uniq,$first["kode_gejala"]);
+          for ($l=0; $l < count($check["kode_gejala"]); $l++) { 
+            $gejala = $check["kode_gejala"][$l];
+
+            array_push($arr_gejala_uniq,$gejala);
+
+          }
+
+        }
+      }
+
+      if(!$found){
+      $arr = array("kode_penyakit"=>$first["kode_penyakit"],"kode_gejala" => array($first["kode_gejala"]));
+      array_push($new_data,$arr);
+    }else{
+      if($index >= 0){
+        $new_data[$index]["kode_gejala"] = $arr_gejala_uniq;
+      }
     }
-    if(array_equal($arr_gejala,$kode_gejala)){
-      $found = true;
-      $notfound=false;
-      $kode_result = $get_penyakit[$i];
-      tambah_result_konsultasi($_SESSION["id_user"],$get_penyakit[$i]["id_penyakit"]);
-    }   
+    $arr_gejala_uniq = [];
+    $index = -1;
+    }
+$result = [];
+    for ($i=0; $i <count($new_data) ; $i++) { 
+      $used = $new_data[$i];
+      if(count($used["kode_gejala"]) > 1){
+        $value = 0; 
+        $countmb = 0;
+          $countmd = 0;
+        for ($j=0; $j <count($used["kode_gejala"]) ; $j++) { 
+          $kode_gejala = $used["kode_gejala"][$j];
+          $kode_penyakit = $used["kode_penyakit"];
+          $found_detail = query("select * from basispengetahuan,penyakit where basispengetahuan.kode_penyakit = penyakit.kode_penyakit and basispengetahuan.kode_gejala ='".$kode_gejala."' and basispengetahuan.kode_penyakit = '".$kode_penyakit."'");
+          $found_detail =$found_detail[0];
+          $mb=(float) str_replace(',', '.', $found_detail["mb"]);
+          $md=(float) str_replace(',', '.', $found_detail["md"]);
+          if($j ==0 ){
+            $countmb = 0+($mb*(1-0)); 
+            $countmd = 0+($md*(1-0)); 
+           
+          }else{
+            $countmb = $mb+($countmb*(1-$mb)); 
+            $countmd = $md+($countmd*(1-$md)); 
+          }
+          
+        }
+        $value = $countmb - $countmd;
+       
+        array_push($result,array("kode_penyakit" => $kode_penyakit,"id_penyakit" => $found_detail["id_penyakit"],"nama_penyakit" => $found_detail["nama_penyakit"],"value" => $value));
+
+
+      }else{
+        $kode_gejala = $used["kode_gejala"][0];
+        $kode_penyakit = $used["kode_penyakit"];
+        $found_detail = query("select * from basispengetahuan,penyakit where basispengetahuan.kode_penyakit = penyakit.kode_penyakit and basispengetahuan.kode_gejala ='".$kode_gejala."' and basispengetahuan.kode_penyakit = '".$kode_penyakit."'");
+        $found_detail =$found_detail[0];
+        $mb=(float) str_replace(',', '.', $found_detail["mb"]);
+        $md=(float) str_replace(',', '.', $found_detail["md"]);
+        $value = $mb -  $md;
+        array_push($result,array("kode_penyakit" => $kode_penyakit,"nama_penyakit" => $found_detail["nama_penyakit"],"id_penyakit" => $found_detail["id_penyakit"],"value" => $value));
+      }
+
+    }
+
+    $sorted = usort($result, function ($item1, $item2) {
+      return $item2['value'] <=> $item1['value'];
+  });
+    tambah_result_konsultasi($_SESSION["id_user"],$result[0]["id_penyakit"],(string)$result[0]["value"]*100);
+
+
+    die();
   }
-  // echo $notfound;
-  //   var_dump($kode_result);
-  // die();
+  
 
   
   }
   
-}
+
  
 ?>
 
@@ -185,181 +251,55 @@ if(isset($_POST['submit'])){
                      
                       <button type="submit" name="submit" class="btn btn-info">Cek Hasil</button>
 
-<?php
 
-$perintah = "SELECT  basispengetahuan.kode_penyakit, basispengetahuan.nama_gejala, basispengetahuan.mb, basispengetahuan.md
-FROM penyakit, gejala, basispengetahuan
-  WHERE penyakit.kode_penyakit=basispengetahuan.kode_penyakit
-    AND gejala.kode_gejala=basispengetahuan.kode_gejala 
-     ";
-  $minta =mysqli_query($conn,$perintah);
-	$sql = '';
-	$i = 0;
-  //mengecek semua chekbox gejala
-  while($hs=mysqli_fetch_array($minta))
-  {
-    //jika gejala dipilih
-    //menyusun daftar gejala misal '1','2','3' dst utk dipakai di query
-    if ($_POST['gejala'.$hs['kode_gejala']] == 'true')
-    {
-      if ($sql == '')
-      {
-        $sql = "'$hs[kode_gejala]'";
-      }
-      else
-      {
-        $sql = $sql.",'$hs[kode_gejala]'";
-      }
-    }
-    $i++;
-  }
-
-empty($daftar_penyakit);
-empty($daftar_cf);
-if($sql != '')
-{
-  //mencari kode penyakit di tabel basisdata yang gejalanya dipilih
-  $perintah = "SELECT kode_penyakit FROM basispengetahuan WHERE kode_gejala IN ($row) GROUP BY kode_penyakit ORDER BY kode_penyakit";
-  //echo "<br/>".$perintah."<br/>";
-  $minta =mysqli_query($mysqli,$perintah);
-  $kode_penyakit_terbesar = '';
-  $nama_penyakit_terbesar = '';
-  $c = 0;
-
-  while($hs=mysqli_fetch_array($minta))
-  {
-    //memproses id penyakit satu persatu
-    $kode_penyakit = $hs['kode_penyakit'];
-    $qryi = "SELECT * FROM penyakit WHERE kode_penyakit = '$kode_penyakit'";
-    $qry =mysqli_query($mysqli,$qryi);
-    $dt = mysqli_fetch_array($qry);
-    $nama_penyakit = $dt['nama_penyakit'];
-    $daftar_penyakit[$c] = $hs['kode_penyakit'];
-    $p = "SELECT kode_penyakit, mb, md, kode_gejala FROM basispengetahuan WHERE kode_gejala IN ($sql) AND kode_penyakit = '$kode_penyakit'";
-    //echo $p.'<br/>';
-    $m =mysqli_query($mysqli,$p);
-    //mencari jumlah gejala yang ditemukan
-    $jml = mysqli_num_rows($m);
-    //jika gejalanya 1 langsung ketemu CF nya
-    if ($jml == 1)
-    {
-      $h=mysqli_fetch_array($m);
-      $mb = $h['mb'];
-      $md = $h['md'];
-      $cf = $mb - $md;
-      $daftar_cf[$c] = $cf;
-      //cek apakah penyakit ini adalah penyakit dgn CF terbesar ?
-      if (($id_penyakit_terbesar == '') || ($cf_terbesar < $cf))
-      {
-        $cf_terbesar = $cf;
-        $id_penyakit_terbesar = $kode_penyakit;
-        $nama_penyakit_terbesar = $nama_penyakit;
-      }
-    //jika jumlah gejala cuma dua maka CF ketemu	
-    }
-    else if ($jml > 1)
-    {
-      $i = 1;
-      //proses gejala satu persatu
-      while($h=mysqli_fetch_array($m))
-      {
-        //pada gejala yang pertama masukkan MB dan MD menjadi MBlama dan MDlama
-        if ($i == 1)
-        {
-          $mblama = $h['mb'];
-          $mdlama = $h['md'];
-          }
-        //pada gejala yang nomor dua masukkan MB dan MD menjadi MBbaru dan MB baru kemudian hitung MBsementara dan MDsementara
-        else if ($i == 2)
-        {
-          $mbbaru = $h['mb'];
-          $mdbaru = $h['md'];
-          $mbsementara = $mblama + ($mbbaru * (1 - $mblama));
-          $mdsementara = $mdlama + ($mdbaru * (1 - $mdlama));
-          //jika jumlah gejala cuma dua maka CF ketemu
-          if ($jml == 2)
-          {
-            $mb = $mbsementara;
-            $md = $mdsementara;
-            $cf = $mb - $md;
-            $daftar_cf[$c] = $cf;
-            //cek apakah penyakit ini adalah penyakit dgn CF terbesar ?
-            if (($id_penyakit_terbesar == '') || ($cf_terbesar < $cf))
-            {
-              $cf_terbesar = $cf;
-              $id_penyakit_terbesar = $id_penyakit;
-              $nama_penyakit_terbesar = $nama_penyakit;
-            }
-          }
-        }
-        //pada gejala yang ke 3 dst proses MBsementara dan MDsementara menjadi MBlama dan MDlama
-			  //MB dan MD menjadi MBbaru dan MDbaru
-				//hitung MBsementara dan MD sementara yg sekarang
-				else if ($i >= 3)
-				{
-					$mblama = $mbsementara;
-					$mdlama = $mdsementara;
-					$mbbaru = $h['mb'];
-					$mdbaru = $h['md'];
-					$mbsementara = $mblama + ($mbbaru * (1 - $mblama));
-					$mdsementara = $mdlama + ($mdbaru * (1 - $mdlama));
-					//jika ini adalah gejala terakhir berarti CF ketemu
-					if ($jml == $i)
-					{
-						$mb = $mbsementara;
-						$md = $mdsementara;
-						$cf = $mb - $md;
-						$daftar_cf[$c] = $cf;
-            //cek apakah penyakit ini adalah penyakit dgn CF terbesar ?
-            if (($id_penyakit_terbesar == '') || ($cf_terbesar < $cf))
-            {
-              $cf_terbesar = $cf;
-              $id_penyakit_terbesar = $kode_penyakit;
-              $nama_penyakit_terbesar = $nama_penyakit;
-            }
-          }
-        }
-        $i++;
-      }
-      }
-      $c++;
-  }
-}
-//urutkan daftar gejala berdasarkan besar CF
-for ($i = 0; $i < count($daftar_penyakit); $i++)
-{
-  for ($j = $i + 1; $j < count($daftar_penyakit); $j++)
-  {
-    if ($daftar_cf[$j] > $daftar_cf[$i])
-    {
-      $t = $daftar_cf[$i];
-      $daftar_cf[$i] = $daftar_cf[$j];
-      $daftar_cf[$j] = $t;
-
-      $t = $daftar_penyakit[$i];
-      $daftar_penyakit[$i] = $daftar_penyakit[$j];
-      $daftar_penyakit[$j] = $t;
-    }
-  }
-}
-
-?>
-
-
-                      
+             
                     <div class="panel panel-info">
                     </form>
 
                   </div>
+                  <?php if($search){ ?>
+                    <?php if(count($result) == 0){ ?>
+                    <p class="text-center"> hasil diagnosis tidak di temukan</p>
+                      <?php
+                      }else{ ?>
+                      <div class="row">
+                      <p>Hasil Diagnosis :</p>
+                      <!-- result -->
+                      <table class="table table-bordered">
+                                <tr class="text-center text-light" style="background-color:#2D6187;">
+                                <th>Kode Penyakit</th>
+                                <th>Nama penyakit</th>
+                                <th>Presentase</th>
+                                <th>Aksi</th>
+                                </tr>
+
+                                <?php $i = 1; ?>
+                                <?php foreach($result as $row) : ?>
+                                <tr class="text-center">
+                                <td><?= $row["kode_penyakit"]; ?> </td>
+                                <td><?= $row["nama_penyakit"];?> </td>
+                                <td><?= $row["value"]*100; ?>% </td>
+                                <td>
+                                  <a href="detail_penyakit.php?kode_penyakit=<?= $row["kode_penyakit"];?>" >Detail penyakit <a style="margin-left:5px" class="mdi mdi-book-open-page-variant"></a></a>
+                                </td>
+                                </tr>
+                                <?php endforeach; ?>
+                            </table><br><br>
+                            <!-- end result -->
+                      </div>
+                      <?php } ?>
+   
+                  <?php } ?>
+                 
                 </div>
               </div>
+
             </div>
+            
           </div>
           <!-- content-wrapper ends -->
 
-                        <!-- result -->
-                        
-                        <!-- end result -->
+                   
 
           <!-- partial:partials/_footer.html -->
           <footer class="footer">
